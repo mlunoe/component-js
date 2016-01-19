@@ -11,6 +11,14 @@ var win = doc.defaultView;
 global.document = doc;
 global.window = win;
 
+//JSDOM doesn't support localStrage by default, so lets just fake it..
+if (!global.window.localStorage) {
+    global.window.localStorage = {
+        getItem() { return '{}'; },
+        setItem() {}
+    };
+}
+
 // take all properties of the window object and also attach it to the
 // mocha global object
 propagateToGlobal(win);
