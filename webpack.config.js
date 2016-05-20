@@ -1,3 +1,4 @@
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 var webpack = require('webpack');
 var path = require('path');
 var resolve = function (dir) {
@@ -15,7 +16,11 @@ module.exports = {
         filename: 'bundle.js'
     },
     plugins: [
-        new webpack.HotModuleReplacementPlugin()
+        new webpack.HotModuleReplacementPlugin(),
+        new HtmlWebpackPlugin({
+         append: true,
+         template: path.join(__dirname, 'build/index.html')
+     })
     ],
     module: {
         loaders: [
