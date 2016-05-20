@@ -4,7 +4,7 @@
   "description": "Webpack, React, Babel, Mocha + JSDOM boilerplate",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack-dev-server --dev-tool eval --progress --colors --hot --content-base build",
+    "start": "webpack-dev-server --dev-tool eval --progress --colors --hot --content-base build",
     "deploy": "NODE_ENV=production webpack -p --config webpack.production.config.js",
     "test": "mocha app/__tests__/* app/__tests__/**/*"
   },
