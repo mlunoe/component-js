@@ -1,9 +1,14 @@
-const React = require('react');
-const ReactDOM = require('react-dom');
+import Counter from './counter.js';
 
-const Counter = require('./counter.jsx');
+let app = document.createElement('div');
+let counter = new Counter();
 
-ReactDOM.render(
-    <Counter />,
-    document.getElementById('app')
-)
+let renderApp = function (count) {
+  app.innerHTML = counter.render();
+};
+
+renderApp();
+counter.subscribe(renderApp);
+
+// Mount app
+document.getElementById('app').appendChild(app);
