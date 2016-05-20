@@ -1,3 +1,4 @@
+var webpack = require('webpack');
 var path = require('path');
 var resolve = function (dir) {
     return path.resolve(__dirname, dir);
