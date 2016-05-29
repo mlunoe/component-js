@@ -1,44 +1,49 @@
-module.exports = class Counter {
-  constructor() {
-    this._count = 0;
-    this._subscribers = [];
-    this.restartTimer();
-  }
+let Counter = (function () {
+  let count = 0;
+  let counterID;
+  let subscribers = [];
 
-  restartTimer() {
-    if (this._counterID) {
-      clearInterval(this._counterID);
-    }
-
-    this._counterID = setInterval(() => {
-      this._count = this.count + 1;
-      this._subscribers.forEach((onChange) => {
-        onChange();
-      });
-    }, 1000);
-  }
-
-  subscribe(onChange) {
-    if (typeof onChange === 'function') {
-      this._subscribers.push(onChange);
-    }
-  }
-
-  unsubscribe(handler) {
-    this._subscribers = this._subscribers.filter(function (onChange) {
-      return onChange !== handler;
+  let notifySubscribers = function () {
+    subscribers.forEach(function(onChange) {
+      onChange();
     });
   }
 
-  get count() {
-    return this._count;
-  }
+  return {
+    restartTimer() {
+      if (counterID) {
+        clearInterval(counterID);
+      }
 
-  render() {
-    return (
-      '<span>' +
-        `Seconds passed since you have opened this page: ${this.count}.` +
-      '</span>'
-    );
-  }
-};
+      count = 0;
+      notifySubscribers();
+      // Tick each second
+      counterID = setInterval(function () {
+        count++;
+        notifySubscribers();
+      }, 1000);
+    },
+
+    subscribe(onChange) {
+      if (typeof onChange === 'function') {
+        subscribers.push(onChange);
+      }
+    },
+
+    unsubscribe(handler) {
+      subscribers = subscribers.filter(function (onChange) {
+        return onChange !== handler;
+      });
+    },
+
+    render() {
+      return (
+        '<span>' +
+          `Seconds passed since you have opened this page: ${count}.` +
+        '</span>'
+      );
+    }
+  };
+});
+
+module.exports = Counter;

@@ -1,14 +1,16 @@
 import Counter from './components/Counter/Counter.js';
 
-let app = document.createElement('div');
-let counter = new Counter();
+window.onload = function () {
+  let app = document.createElement('div');
+  let counter = new Counter();
 
-let renderApp = function (count) {
-  app.innerHTML = counter.render();
+  let renderApp = function (count) {
+    app.innerHTML = counter.render();
+  };
+
+  counter.subscribe(renderApp);
+
+  // Mount app
+  document.getElementById('app').appendChild(app);
+  counter.restartTimer();
 };
-
-renderApp();
-counter.subscribe(renderApp);
-
-// Mount app
-document.getElementById('app').appendChild(app);
