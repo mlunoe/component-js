@@ -1,4 +1,4 @@
-import Counter from './counter.js';
+import Counter from './components/Counter/Counter.js';
 
 let app = document.createElement('div');
 let counter = new Counter();

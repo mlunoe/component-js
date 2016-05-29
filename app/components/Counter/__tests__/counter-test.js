@@ -1,7 +1,7 @@
 var expect = require('chai').expect;
 var sinon = require('sinon');
 
-var Counter = require('../counter.js');
+var Counter = require('../Counter.js');
 
 describe('CounterApp', function () {
   var clock;
@@ -11,6 +11,7 @@ describe('CounterApp', function () {
   beforeEach(function () {
     clock = sinon.useFakeTimers();
     counter = new Counter();
+    counter.restartTimer();
     div = document.createElement('div')
     div.innerHTML = counter.render();
   });
