@@ -1,9 +1,9 @@
-Webpack + React + Babel + Mocha + JSDOM boilerplate  
+Webpack + Babel + Mocha + JSDOM boilerplate
 ===
 
-It renders a simple Counter component which increments by 1 each second.  
-It has a simple test checking whether the React component has rendered.
-Used as a start learning point.  
+It renders a simple Counter component which increments by 1 each second.
+It has a simple test checking whether the component has rendered.
+Used as a start learning point.
 
 ### Usage
 

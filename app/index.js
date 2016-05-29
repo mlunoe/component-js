@@ -1,3 +1,4 @@
+require('./index.scss');
 import Counter from './components/Counter/Counter.js';
 
 window.onload = function () {
