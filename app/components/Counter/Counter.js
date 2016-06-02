@@ -1,49 +1,32 @@
-let Counter = (function () {
-  let count = 0;
-  let counterID;
-  let subscribers = [];
+var Component = require('../Component/Component');
 
-  let notifySubscribers = function () {
-    subscribers.forEach(function(onChange) {
-      onChange();
-    });
-  }
+var Counter = (function () {
+  var count = 0;
+  var counterID;
 
-  return {
+  return Object.assign({
     restartTimer() {
       if (counterID) {
         clearInterval(counterID);
       }
 
       count = 0;
-      notifySubscribers();
+      this.notifySubscribers();
       // Tick each second
-      counterID = setInterval(function () {
+      counterID = setInterval(() => {
         count++;
-        notifySubscribers();
+        this.notifySubscribers();
       }, 1000);
     },
 
-    subscribe(onChange) {
-      if (typeof onChange === 'function') {
-        subscribers.push(onChange);
-      }
-    },
-
-    unsubscribe(handler) {
-      subscribers = subscribers.filter(function (onChange) {
-        return onChange !== handler;
-      });
-    },
-
-    render() {
+    getView() {
       return (
-        '<span>' +
+        '<div class="text-center">' +
           `Seconds passed since you have opened this page: ${count}.` +
-        '</span>'
+        '</div>'
       );
     }
-  };
+  }, new Component());
 });
 
 module.exports = Counter;
