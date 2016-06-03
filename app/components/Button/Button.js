@@ -1,10 +1,11 @@
 var Component = require('../Component/Component');
+var ObjectUtil = require('../../utils/ObjectUtil');
 
 var Button = (function () {
   var count = 0;
   var counterID;
 
-  return Object.assign({
+  return ObjectUtil.assign({
     componentDidMount(element) {
       element.onclick = this.handleClick;
     },

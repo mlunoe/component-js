@@ -1,0 +1,11 @@
+.arrow-container {
+  &:before {
+    width: 36px;
+    height: 36px;
+    content: '<';
+  }
+
+  &.forward:before {
+    content: '>';
+  }
+}

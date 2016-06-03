@@ -74,7 +74,9 @@ function Component() {
       tempNode.innerHTML = this.getView.apply(this, props);
       // Get the first child of temporary node, i.e. our view
       var newElement = tempNode.firstChild;
-      if (element) {
+      // Make sure that element is actually a child node of parent
+      // before we attempt to replace
+      if (element && parentNode === element.parentNode) {
         // Handle consecutive renders
         parentNode.replaceChild(newElement, element);
       } else {
@@ -86,10 +88,11 @@ function Component() {
       element = newElement;
 
       if (typeof this.componentDidMount === 'function') {
-        this.componentDidMount(element);
+        var args = [element].concat(props);
+        this.componentDidMount.apply(this, args);
       }
     }
   };
-});
+}
 
 module.exports = Component;

@@ -1,5 +1,6 @@
 var Component = require('./components/Component/Component');
 var ImageViewer = require('./components/ImageViewer/ImageViewer');
+var Thumbnail = require('./components/Thumbnail/Thumbnail');
 var ObjectUtil = require('./utils/ObjectUtil');
 
 function App() {
@@ -57,10 +58,10 @@ function App() {
         return;
       }
 
-      children.forEach(function (child, index) {
-        var props = child.props;
+      children.forEach(function (props, index) {
+        var thumbnail = new Thumbnail();
         props.index = index;
-        child.component.render(element, props);
+        thumbnail.render(element, props);
       });
     },
 
@@ -79,7 +80,7 @@ function App() {
         images: children,
         onLeftClick: handleImageViewerLeftClick.bind(this, children),
         onRightClick: handleImageViewerRightClick.bind(this, children),
-        children: [selectedChild]
+        child: selectedChild
       };
       return imageViewer.render(element, props);
     },
