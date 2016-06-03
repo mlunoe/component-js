@@ -13,10 +13,10 @@ global.window = win;
 
 //JSDOM doesn't support localStrage by default, so lets just fake it..
 if (!global.window.localStorage) {
-    global.window.localStorage = {
-        getItem() { return '{}'; },
-        setItem() {}
-    };
+  global.window.localStorage = {
+    getItem() { return '{}'; },
+    setItem() {}
+  };
 }
 
 // take all properties of the window object and also attach it to the
@@ -25,7 +25,7 @@ propagateToGlobal(win);
 
 // from mocha-jsdom https://github.com/rstacruz/mocha-jsdom/blob/master/index.js#L80
 function propagateToGlobal (window) {
-  for (let key in window) {
+  for (var key in window) {
     if (!window.hasOwnProperty(key)) continue;
     if (key in global) continue;
 

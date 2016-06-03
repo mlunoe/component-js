@@ -7,6 +7,8 @@ Used as a start learning point.
 
 ### Usage
 
+Built with node v4.4.4 and npm v3.9.1.
+
 ```
 npm install && npm start
 open http://localhost:8080

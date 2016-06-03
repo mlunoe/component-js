@@ -58,14 +58,14 @@ module.exports = {
 	module: {
 		loaders: [
 			// JavaScript loader
-			{
-				test: /\.(js|jsx)$/,
-				exclude: [resolve('node_modules')],
-				loader: 'babel',
-				query: {
-					presets: ['es2015'] // 'react-hot'
-				}
-			},
+			// {
+			// 	test: /\.(js|jsx)$/,
+			// 	exclude: [resolve('node_modules')],
+				// loader: 'babel',
+				// query: {
+				// 	presets: ['es2015'] // 'react-hot'
+				// }
+			// },
 			// SCSS loader
 			{
         test: /\.scss$/,
