@@ -9,7 +9,6 @@ function ImageViewer() {
   var image = new Image();
   var imageViewer = Object.create(new Component());
 
-
   var handleImageChange = function (props, event) {
     var images = props.images;
     var onLeftClick = props.onLeftClick;
@@ -66,6 +65,10 @@ function ImageViewer() {
         element.querySelector('.display-image'),
         props.child
       );
+
+      if (typeof props.onClose === 'function') {
+        element.querySelector('.close-button').onclick = props.onClose;
+      }
     },
 
     renderDisplayImage: function (element, props) {
@@ -79,6 +82,7 @@ function ImageViewer() {
     getFooter: function () {
       return (
         '<div>' +
+          '<div class="close-button"></div>' +
           '<div data-direction="left" class="arrow-container"></div>' +
           '<div data-direction="right" class="arrow-container forward"></div>' +
         '</div>'

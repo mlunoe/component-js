@@ -80,6 +80,7 @@ function App() {
         images: children,
         onLeftClick: handleImageViewerLeftClick.bind(this, children),
         onRightClick: handleImageViewerRightClick.bind(this, children),
+        onClose: handleImageViewerModalClose,
         child: selectedChild
       };
       return imageViewer.render(element, props);
