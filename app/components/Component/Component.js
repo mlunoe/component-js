@@ -2,11 +2,12 @@
  * Example usage:
  *
  * var Component require('../Component/Component');
+ * var ObjectUtil = require('./utils/ObjectUtil');
  *
- * module.exports = var MyComponent = (function () {
+ * module.exports = function MyComponent() {
  *   // Private scope
  *
- *   return Object.assign({
+ *   return ObjectUtil.assign(Object.create(new Component()), {
  *
  *     componentDidMount(element) {
  *       // Do something with element after mount
@@ -20,11 +21,11 @@
  *         '</div>'
  *       );
  *     }
- *   }, new Component());
- * });
+ *   })
+ * };
  */
 
-var Component = (function () {
+function Component() {
   // Private scope
   var element;
   var subscribers = [];
@@ -66,10 +67,11 @@ var Component = (function () {
      * Calls componentDidMount when node has mounted
      * @param  {DOM Node} parentNode to render component within
      */
-    render(parentNode) {
+    render(parentNode /*, ...props*/) {
+      var props = Array.prototype.slice.call(arguments, 1);
       // Create temporary node to set innerHTML in
       var tempNode = document.createElement('div');
-      tempNode.innerHTML = this.getView();
+      tempNode.innerHTML = this.getView.apply(this, props);
       // Get the first child of temporary node, i.e. our view
       var newElement = tempNode.firstChild;
       if (element) {

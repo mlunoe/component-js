@@ -1,28 +1,28 @@
 require('./index.scss');
-var Button = require('./components/Button/Button');
-var Counter = require('./components/Counter/Counter');
+var App = require('./App');
+var Image = require('./components/Image/Image');
 var RequestUtil = require('./utils/RequestUtil');
 
 window.onload = function () {
-  var app = document.createElement('div');
-  app.classList.add('container-fluid');
-
   var children = [];
+  var container = document.createElement('div');
+  var app = new App();
   // Declare counter
-  var counter = new Counter();
-  counter.subscribe(function (count) {
-    counter.render(app);
-  });
-  counter.restartTimer();
   RequestUtil.jsonp('https://api.flickr.com/services/feeds/photos_public.gne?format=json', 'jsonFlickrFeed', function (photos) {
     children = photos.items.map(function (photo) {
-      return {src: photo.media.m}
+      return {
+        component: new Image(),
+        props: {src: photo.media.m}
+      };
     });
 
-  // Declare button
-  var button = new Button();
-  button.render(app);
+    app.render(container, {children: children});
+  });
 
   // Mount app
-  document.getElementById('app').appendChild(app);
+  app.subscribe(function () {
+    app.render(container, {children: children});
+  });
+  app.render(container, {children: children});
+  document.getElementById('app').appendChild(container);
 };
