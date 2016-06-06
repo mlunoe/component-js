@@ -27,7 +27,7 @@ See it running here [https://mlunoe.github.io/slack-assignment](https://mlunoe.g
 
 ### Features
 - The page displays images from the Flickr feed
-- Typing something in the search bar will display images from that search
+- Typing something in the search bar will display images from that search. This search bar was not part of the assignment, but I decided to add it since I built it as a handy tool for me to get variying data.
 - Clicking an image opens the lightbox/image viwer
 - When the image viewer is open you can click the arrows at the bottom to navigate back and forth, or use the left and right arrow keys
 - When the image viewer is open you can click close button (×) to close the modal, or use the esc key
