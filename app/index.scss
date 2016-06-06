@@ -1,7 +1,43 @@
+$white: #fdfcfe;
+$black: #000;
+$gray-dark: lighten($black, 20%);
+$gray: lighten($black, 33.5%);
+$pink: #ff1493;
 
+@import './components/Grid/grid';
 @import './components/Image/image';
-@import './components/ImageViewer/imageViewer';
+@import './components/Thumbnail/thumbnail';
+@import './components/ImageViewer/image-viewer';
+@import './components/ImageGrid/image-grid';
+@import './components/SearchBar/search-bar';
+
+* {
+  box-sizing: border-box;
+}
 
 body {
-  background-color: #333; // $gray-dark;
+  background-color: $gray-dark;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  margin: 0;
+  overflow: hidden;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
+
+.text-white {
+  color: $white;
+}
+
+.text-align-center {
+  text-align: center;
+}
+
+.primary {
+  color: $pink;
 }

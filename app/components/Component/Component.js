@@ -7,13 +7,16 @@
  * module.exports = function MyComponent() {
  *   // Private scope
  *
- *   return ObjectUtil.assign(Object.create(new Component()), {
- *
+ *   return ObjectUtil.inherits({
  *     componentDidMount(element) {
  *       // Do something with element after mount
  *     },
  *
- *     getView(parentNode) {
+ *     componentWillUnmount() {
+ *       // Clean up component
+ *     },
+ *
+ *     getView(parentElement) {
  *       // Return string of component view
  *       return (
  *         '<div>' +
@@ -21,67 +24,42 @@
  *         '</div>'
  *       );
  *     }
- *   })
+ *   }, Component);
  * };
  */
 
 function Component() {
   // Private scope
   var element;
-  var subscribers = [];
 
   return {
     // Public API
-
-    /**
-     * Function to call to notify subscribers of change
-     */
-    notifySubscribers() {
-      subscribers.forEach(function(onChange) {
-        onChange();
-      });
-    },
-
-    /**
-     * Subscribe to change fired by implementing component
-     * @param  {function} onChange handler that is called on change
-     */
-    subscribe(onChange) {
-      if (typeof onChange === 'function') {
-        subscribers.push(onChange);
-      }
-    },
-
-    /**
-     * Unsubscribe from change events fired by implementing component
-     * @param  {function} handler to remove from change events
-     */
-    unsubscribe(handler) {
-      subscribers = subscribers.filter(function (onChange) {
-        return onChange !== handler;
-      });
-    },
-
     /**
      * Function to call when component should render into parent node
      * Calls componentDidMount when node has mounted
-     * @param  {DOM Node} parentNode to render component within
+     * @param  {DOM Node} parentElement to render component within
      */
-    render(parentNode /*, ...props*/) {
+    render: function (parentElement) { // , ...props
       var props = Array.prototype.slice.call(arguments, 1);
       // Create temporary node to set innerHTML in
       var tempNode = document.createElement('div');
       tempNode.innerHTML = this.getView.apply(this, props);
       // Get the first child of temporary node, i.e. our view
       var newElement = tempNode.firstChild;
+      // Rendering into new parent, unmount this element, so we can create a new
+      if (element && parentElement !== element.parentNode) {
+        this.unmount();
+      }
       // Make sure that element is actually a child node of parent
       // before we attempt to replace
-      if (element && parentNode === element.parentNode) {
+      if (element && parentElement === element.parentNode) {
         // Handle consecutive renders
-        parentNode.replaceChild(newElement, element);
-      } else {
+        parentElement.replaceChild(newElement, element);
+      }
+
+      if (!element) {
         // Handle first render
-        parentNode.appendChild(newElement);
+        parentElement.appendChild(newElement);
       }
 
       // Store our new instance
@@ -91,6 +69,24 @@ function Component() {
         var args = [element].concat(props);
         this.componentDidMount.apply(this, args);
       }
+    },
+
+    /**
+     * Unmounts element from its parent, if it has a parent. Calls
+     * componentWillUnmount if defined on object.
+     */
+    unmount: function () {
+      if (typeof this.componentWillUnmount === 'function') {
+        this.componentWillUnmount();
+      }
+
+      // Check if child still has a parent node before attempting to remove
+      if (element && element.parentNode) {
+        element.parentNode.removeChild(element);
+      }
+
+      // Delete reference
+      element = undefined;
     }
   };
 }

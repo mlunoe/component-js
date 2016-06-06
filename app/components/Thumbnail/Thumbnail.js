@@ -1,21 +1,34 @@
 var Component = require('../Component/Component');
-var Image = require('../Image/Image');
 var ObjectUtil = require('../../utils/ObjectUtil');
 
 function Thumbnail() {
-  var image = new Image();
+  return ObjectUtil.inherits({
+    getView: function (props) {
+      if (!props.src) {
+        return '';
+      }
+      var classes = 'thumbnail';
+      if (props.className) {
+        classes += ' ' + props.className;
+      }
 
-  return ObjectUtil.assign(Object.create(new Component()), {
-    componentDidMount: function (element, props) {
-      image.render(element, props);
-    },
+      var dataIndex = '';
+      if (props.index != null) {
+        dataIndex = 'data-index="' + props.index + '" '
+      }
 
-    getView(props) {
       return (
-        '<div class="thumbnail"></div>'
+        '<div class="' + classes + '">' +
+          '<div ' +
+            'class="fill-image" ' +
+            dataIndex +
+            'data-src="' + props.src + '" ' +
+            'style="background-image: url(' + props.src + ')">' +
+          '</div>' +
+        '</div>'
       );
     }
-  });
+  }, Component);
 }
 
 module.exports = Thumbnail;

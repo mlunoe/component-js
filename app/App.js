@@ -1,103 +1,73 @@
 var Component = require('./components/Component/Component');
-var ImageViewer = require('./components/ImageViewer/ImageViewer');
-var Thumbnail = require('./components/Thumbnail/Thumbnail');
+var EventTypes = require('./constants/EventTypes');
+var FunctionUtil = require('./utils/FunctionUtil');
+var SearchBar = require('./components/SearchBar/SearchBar');
+var ImageGrid = require('./components/ImageGrid/ImageGrid');
 var ObjectUtil = require('./utils/ObjectUtil');
+var PhotoStore = require('./stores/PhotoStore');
+var Thumbnail = require('./components/Thumbnail/Thumbnail');
 
 function App() {
-  var app = Object.create(new Component());
-  var imageViewer = new ImageViewer();
+  var imageGrid = new ImageGrid();
+  var searchBar = new SearchBar();
   var selectedImage;
+  var renderImageGridHandler;
+  var lastQuery = '';
 
-  var handleImageClick = function (event) {
-    var index = parseInt(event.target.dataset.index, 10);
-    if (!isNaN(index)) {
-      selectedImage = index;
-      app.notifySubscribers();
-    }
-  };
-
-  var handleImageViewerModalClose = function () {
-    selectedImage = undefined;
-    app.notifySubscribers();
-  };
-
-  var handleImageViewerModalOpen = function (imageIndex) {
-    selectedImage = imageIndex;
-  };
-
-  var handleImageViewerLeftClick = function (images) {
-    if (--selectedImage < 0) {
-      selectedImage = images.length - 1;
-    }
-    app.notifySubscribers();
-  };
-
-  var handleImageViewerRightClick = function (images) {
-    // Add before the modulus operator and use modulus as a circular buffer
-    selectedImage = ++selectedImage % images.length;
-    app.notifySubscribers();
-  };
-
-  return ObjectUtil.assign(app, {
-    componentDidMount: function (element, props) {
-      element.onclick = handleImageClick;
-      var children = props.children;
-
-      this.renderChildren(
-        element.querySelector('.image-grid'),
-        children
-      );
-      this.renderSelectedImage(
-        element.querySelector('.selected-image'),
-        children
-      );
-    },
-
-    renderChildren: function (element, children) {
-      if (!element || !children) {
-        return;
-      }
-
-      children.forEach(function (props, index) {
-        var thumbnail = new Thumbnail();
-        props.index = index;
-        thumbnail.render(element, props);
+  return ObjectUtil.inherits({
+    /* Lifecycle methods */
+    componentDidMount: function (element) {
+      // Fetch new photos on input change
+      searchBar.render(element.querySelector('.search-bar'), {
+        onChange: function () {
+          // Don't re-fetch unless we have a new query
+          if (lastQuery !== this.value) {
+            PhotoStore.fetchPhotos(this.value);
+            lastQuery = this.value;
+          }
+        }
       });
+
+      // Re-render image grid when requested
+      renderImageGridHandler = this.renderImageGrid.bind(
+        this,
+        element.querySelector('.image-grid')
+      );
+
+      imageGrid.on(EventTypes.COMPONENT_CHANGE, renderImageGridHandler);
+      // Re-render image grid when new photos are received
+      PhotoStore.on(EventTypes.PHOTO_STORE_PHOTOS_CHANGE, renderImageGridHandler);
+      // Fetch photos on intial render
+      PhotoStore.fetchPhotos(lastQuery);
     },
 
-    renderSelectedImage: function (element, children) {
-      if (!element || !children) {
-        return;
-      }
+    componentWillUnmount: function () {
+      // Never actually called,
+      // but always good practise to clean up after our selves
+      imageGrid.removeChangeListener(
+        EventTypes.PHOTO_STORE_PHOTOS_CHANGE,
+        renderImageGridHandler
+      );
+      PhotoStore.removeChangeListener(
+        EventTypes.PHOTO_STORE_PHOTOS_CHANGE,
+        renderImageGridHandler
+      );
+    },
 
-      var selectedChild = children[selectedImage];
-
-      if (selectedChild === undefined) {
-        return;
-      }
-
-      var props = {
-        images: children,
-        onLeftClick: handleImageViewerLeftClick.bind(this, children),
-        onRightClick: handleImageViewerRightClick.bind(this, children),
-        onClose: handleImageViewerModalClose,
-        child: selectedChild
-      };
-      return imageViewer.render(element, props);
+    /* View functions */
+    renderImageGrid: function (imageGridElement) {
+      imageGrid.render(imageGridElement);
     },
 
     getView: function (props) {
-      props || (props = {});
-      var children = props.children || [];
-
       return (
-        '<div class="app container-fluid">' +
-          '<div class="row image-grid"></div>' +
-          '<div class="selected-image"></div>' +
+        '<div class="app">' +
+          '<div class="search-bar"></div>' +
+          '<div class="image-grid"></div>' +
         '</div>'
       );
     }
-  });
+  }, Component);
 }
 
 module.exports = App;

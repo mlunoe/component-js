@@ -1,110 +1,158 @@
 var Component = require('../Component/Component');
 var Image = require('../Image/Image');
+var EventTypes = require('../../constants/EventTypes');
+var PhotoStore = require('../../stores/PhotoStore');
 var KeyboardUtil = require('../../utils/KeyboardUtil');
 var ObjectUtil = require('../../utils/ObjectUtil');
 
 function ImageViewer() {
-  var listenerAttached = false;
-  var selectedImage = null;
   var image = new Image();
-  var imageViewer = Object.create(new Component());
+  var imageEventHandler;
+  var imageRenderHandler;
+  var photoID;
+  var imageProps;
+  var keyPressListenerAttached = false;
 
-  var handleImageChange = function (props, event) {
-    var images = props.images;
-    var onLeftClick = props.onLeftClick;
-    var onRightClick = props.onRightClick;
-    // Should do nothing if the key event was already consumed,
-    // or there is only one or no images
-    if (event.defaultPrevented || !images || images.length < 2) {
-      return;
+  // Helper method to call provided handler if necessary
+  var callHandler = function (prop, value, keyCode, handler, event) {
+    if (typeof handler === 'function' &&
+      (event.target.dataset[prop] === value || event.keyCode === keyCode)) {
+      handler(event);
+    }
+  }
+
+  var getPhotoID = function (link) {
+    var segments = link.split('/');
+    var id = segments.pop()
+    while (!id) {
+      id = segments.pop();
     }
 
-    var direction = event.target.dataset.direction;
+    return id;
+  }
 
-    if (event.keyCode === KeyboardUtil.keyCodes.leftArrow) {
-      direction = 'left';
-    }
+  var handleImageEvent = function (element, props, event) {
+    var keyCodes = KeyboardUtil.keyCodes;
+    // Handle change image left
+    callHandler('direction', 'left', keyCodes.leftArrow, props.onLeftClick, event);
 
-    if (event.keyCode === KeyboardUtil.keyCodes.rightArrow) {
-      direction = 'right';
-    }
+    // Handle change image right
+    callHandler('direction', 'right', keyCodes.rightArrow, props.onRightClick, event);
 
-    if (direction === 'left' && typeof onLeftClick === 'function') {
-      onLeftClick();
-    }
-
-    if (direction === 'right' && typeof onRightClick === 'function') {
-      onRightClick();
-    }
-
-    // Consume the event for suppressing "double action".
-    event.preventDefault();
-
-    // this.handleLoadingImageChange(true);
+    // Handle close viewer
+    callHandler('close', 'true', keyCodes.esc, function () {
+      // Remove class to animate. Call close when animation is done
+      element.classList.remove('show');
+      setTimeout(function () {
+        props.onClose(event);
+      }, 200);
+    }, event);
   };
 
-  var attachDetachKeyPressListener = function (props) {
-    var handler = handleImageChange.bind(imageViewer, props);
-    var images = props.images;
-    // Closes
-    if (!(images || images.length) && listenerAttached) {
-      global.window.removeEventListener('keydown', handler, true);
-    }
-
-    // Opens
-    if (images && images.length && !listenerAttached) {
-      global.window.addEventListener('keydown', handler, true);
-    }
-  };
-
-  return ObjectUtil.assign(imageViewer, {
+  return ObjectUtil.inherits({
     componentDidMount: function (element, props) {
-      element.onclick = handleImageChange.bind(this, props);
+      // Set event handlers
+      imageEventHandler = handleImageEvent.bind(this, element, props);
+      element.onclick = imageEventHandler
+      // Viewre is opening
+      if (props.child && !keyPressListenerAttached) {
+        keyPressListenerAttached = true;
+        global.window.addEventListener('keydown', imageEventHandler, true);
+      }
 
-      this.renderDisplayImage(
+      // Add show class in next render cycle to animate in
+      if (props.shouldAnimateIn) {
+        setTimeout(function () {
+          element.classList.add('show');
+        }, 100);
+      }
+
+      // TODO: Handle start loading
+      photoID = getPhotoID(props.child.link);
+      imageRenderHandler = this.renderImage.bind(
+        this,
         element.querySelector('.display-image'),
         props.child
       );
+      PhotoStore.on(
+        EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
+        imageRenderHandler
+      );
+      PhotoStore.on(
+        EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR,
+        this.renderError
+      );
 
-      if (typeof props.onClose === 'function') {
-        element.querySelector('.close-button').onclick = props.onClose;
+      // Fetch large photo
+      PhotoStore.fetchLargePhoto(photoID);
+    },
+
+    componentWillUnmount: function () {
+      // Clean up listener
+      keyPressListenerAttached = false;
+      global.window.removeEventListener('keydown', imageEventHandler, true);
+      PhotoStore.removeListener(
+        EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
+        imageRenderHandler
+      );
+    },
+
+    renderImage: function (displayImageElement, photo, id) {
+      if (photoID === id) {
+        image.render(displayImageElement, {
+          src: PhotoStore.getLargePhoto(photoID).src,
+          // Transfer other information
+          title: photo.title,
+          link: photo.link
+        });
       }
     },
 
-    renderDisplayImage: function (element, props) {
-      if (!element) {
-        return;
+    renderError: function (id) {
+      if (photoID === id) {
+        // TODO: Handle error
+        console.log('Image request error');
       }
-
-      image.render(element, props);
     },
 
     getFooter: function () {
       return (
-        '<div>' +
-          '<div class="close-button"></div>' +
-          '<div data-direction="left" class="arrow-container"></div>' +
-          '<div data-direction="right" class="arrow-container forward"></div>' +
+        '<div class="arrow-container">' +
+          '<span data-direction="left" class="arrow left"></span>' +
+          '<span data-direction="right" class="arrow right"></span>' +
         '</div>'
       );
     },
 
     getView: function (props) {
-      attachDetachKeyPressListener(props);
+      var dataClose = '';
+      if (props.backdropClose) {
+        dataClose = 'data-close="true"';
+      }
 
-      var images = props.images;
-      if (!images || !images.length) {
-        return '';
+      var imageViewerBackdropClasses = 'image-viewer-backdrop';
+      if (!props.shouldAnimateIn) {
+        imageViewerBackdropClasses += ' show';
+      }
+
+      var child = props.child;
+      var title = '';
+      if (child) {
+        title = '<p class="text-white text-align-center">' + child.title + '<p/>';
       }
 
       return (
-        '<div>' +
-          '<div class="display-image"></div>' +
-          this.getFooter() +
+        '<div ' + dataClose + ' class="' + imageViewerBackdropClasses +'">' +
+          '<div class="image-viewer">' +
+            '<span data-close="true" class="close-button"></span>' +
+            '<div class="display-image"></div>' +
+            title +
+            this.getFooter() +
+          '</div>' +
         '</div>'
       );
     }
-  });
+  }, Component);
 }
 
 module.exports = ImageViewer;

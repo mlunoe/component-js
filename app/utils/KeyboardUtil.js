@@ -1,5 +1,6 @@
 var KeyboardUtil = {
   keyCodes: {
+    esc: 27,
     leftArrow: 37,
     rightArrow: 39
   }
