@@ -19,6 +19,7 @@
   "author": "https://github.com/mlunoe",
   "license": "ISC",
   "devDependencies": {
+    "autoprefixer": "6.3.6",
     "chai": "3.5.0",
     "css-loader": "0.23.1",
     "file-loader": "0.8.5",
@@ -26,6 +27,7 @@
     "jsdom": "9.2.1",
     "mocha": "2.5.3",
     "node-sass": "3.7.0",
+    "postcss-loader": "0.9.1",
     "sass-loader": "3.2.0",
     "sinon": "1.17.4",
     "style-loader": "0.13.1",

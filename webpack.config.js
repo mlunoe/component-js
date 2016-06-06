@@ -1,3 +1,4 @@
+var autoprefixer = require('autoprefixer');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var webpack = require('webpack');
 var path = require('path');
@@ -69,7 +70,7 @@ module.exports = {
 			// SCSS loader
 			{
         test: /\.scss$/,
-        loaders: ['style', 'css?sourceMap', 'sass?sourceMap']
+        loader: "style-loader!css-loader?sourceMap!postcss-loader!sass-loader?sourceMap"
       },
       // File loaders for bootstrap fonts
       {
@@ -93,5 +94,8 @@ module.exports = {
       	loader: 'url?limit=10000&mimetype=image/svg+xml'
     	}
 		]
-	}
+	},
+  postcss: function () {
+    return [autoprefixer];
+  }
 };
