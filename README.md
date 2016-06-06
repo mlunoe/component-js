@@ -19,7 +19,8 @@ See it running here [https://mlunoe.github.io/slack-assignment](https://mlunoe.g
 - IE overflows the grid, because of scrollbar
 - Missing to handle loading and errors for the image viewer, and thumbnail grid
 - Only a few essential parts of the app have been tested, like the Component, EventEmitter and ObjectUtil, but a lot of the visual parts needs tests
-- Using JSONP, which is a hacky way of working around cross origin issues (it also has the problem of not being cancellable). This app should really have its own server to request content from.
+- Using JSONP, which is a hacky way of working around cross origin issues (it also has the problem of not being cancellable). This app should really have its own server to request content from
+- As I focused on the structure of the application I didn't spend as much time with the visual parts and there is still some polish left to do there for it to be super appealing visually
 
 ### Focus:
 - I decided to heavily focus on building out a modular app structure with self-contained components
