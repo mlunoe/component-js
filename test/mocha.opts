@@ -1,3 +1,2 @@
---compilers js:babel-register
 --require test/utils/dom.js
 --reporter spec
