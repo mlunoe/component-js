@@ -11,6 +11,8 @@ npm install && npm start
 open http://localhost:8080
 ```
 
+See it running here [https://mlunoe.github.io/slack-assignment](https://mlunoe.github.io/slack-assignment/)
+
 ### Limitations
 - If screen gets too wide compared to width (image ratio is 9/16), the image gets cut off at the bottom
 - Image that does not follow the 9/16 ratio gets cut off to fit the ratio, in order to make the elements look nice
