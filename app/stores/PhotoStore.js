@@ -63,7 +63,7 @@ function PhotoStore() {
           this.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR, photoID);
         }
         data.sizes.size.forEach(function (photo) {
-          if (photo.label === 'Original') {
+          if (photo.label === 'Medium') {
             largeImages[photoID] = {src: photo.source};
             this.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, photoID);
           }
