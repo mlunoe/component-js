@@ -27,7 +27,7 @@ function PhotoStore() {
       if (queryString) {
         query = '&tags=' + queryString;
       }
-      var url = baseUrl = '/feeds/photos_public.gne?format=json' + query;
+      var url = baseUrl + '/feeds/photos_public.gne?format=json' + query;
       RequestUtil.jsonp(url, 'jsonFlickrFeed', function (photos) {
         images = photos.items.map(function (photo) {
           // Reduce data to the format we want to store
@@ -57,7 +57,7 @@ function PhotoStore() {
         return;
       }
 
-      var url =  baseUrl = '/rest/?method=flickr.photos.getSizes&api_key=5aa9a623bff2414e17acc8a5a4b894be&photo_id=' + photoID + '&format=json';
+      var url =  baseUrl + '/rest/?method=flickr.photos.getSizes&api_key=5aa9a623bff2414e17acc8a5a4b894be&photo_id=' + photoID + '&format=json';
       RequestUtil.jsonp(url, 'jsonFlickrApi', function (data) {
         if (data.stat !== 'ok') {
           this.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR, photoID);
