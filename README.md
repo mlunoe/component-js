@@ -71,7 +71,7 @@ new MyComponent().render(container);
 - When the modal is open you can click close button (×) to close the modal, or use the esc key
 
 ### License
-Copyright (c) 2016, @mlunoe
+Copyright (c) 2016, [@mlunoe](https://github.com/mlunoe)
 
 Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
 
