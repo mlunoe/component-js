@@ -1,5 +1,8 @@
-Image Viewer App
+component.js
 ===
+
+A minimal JavaScript boilerplate for creating reusable components in ES5 (Image Viewer Example)
+See [Component.js](https://github.com/mlunoe/component-js/blob/master/app/components/Component/Component.js) and an example usage here: [SearchBar.js](https://github.com/mlunoe/component-js/blob/master/app/components/SearchBar/SearchBar.js).
 
 ### Usage
 
@@ -9,6 +12,36 @@ Tested on Chrome v50.0.2661,  Firefox v46.0.1, Safari v9.1.1 and IE11
 ```
 npm install && npm start
 open http://localhost:8080
+```
+
+See it running here [http://mlunoe.github.io/component-js](http://mlunoe.github.io/component-js)
+
+```js
+var Component = require('../Component/Component');
+var ObjectUtil = require('./utils/ObjectUtil');
+
+module.exports = function MyComponent() {
+  // Private scope
+
+  return ObjectUtil.inherits({
+    componentDidMount(element) {
+      // Do something with element after mount
+    },
+
+    componentWillUnmount() {
+      // Clean up component
+    },
+
+    getView(parentElement) {
+      // Return string of component view
+      return (
+        '<div>' +
+          'Example DIV' +
+        '</div>'
+      );
+    }
+  }, Component);
+};
 ```
 
 ### What is this?
