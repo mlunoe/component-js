@@ -1,7 +1,7 @@
 /*
  * Example usage:
  *
- * var Component require('../Component/Component');
+ * var Component = require('../Component/Component');
  * var ObjectUtil = require('./utils/ObjectUtil');
  *
  * module.exports = function MyComponent() {
@@ -54,6 +54,12 @@ function Component() {
       // before we attempt to replace
       if (element && parentElement === element.parentNode) {
         // Handle consecutive renders
+        /*
+         * Replace this line with:
+         * `dd.apply(element, dd.diff(element, newElement));`
+         * from https://github.com/fiduswriter/diffDOM to create a mini version
+         * of React
+         */
         parentElement.replaceChild(newElement, element);
       }
 
