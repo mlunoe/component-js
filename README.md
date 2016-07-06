@@ -1,7 +1,8 @@
 component.js
 ===
 
-A minimal JavaScript boilerplate for creating reusable components in ES5 (Image Viewer Example)
+A minimal modular application structure (boilerplate) in plain JavaScript (ES5) for creating reusable components. The application is a small Image Viewer used as an example for testing the abilities and limitations of the main [Component.js](https://github.com/mlunoe/component-js/blob/master/app/components/Component/Component.js) and structure.
+
 See [Component.js](https://github.com/mlunoe/component-js/blob/master/app/components/Component/Component.js) and an example usage here: [SearchBar.js](https://github.com/mlunoe/component-js/blob/master/app/components/SearchBar/SearchBar.js).
 
 ### Usage
@@ -42,19 +43,20 @@ module.exports = function MyComponent() {
     }
   }, Component);
 };
-```
 
-### What is this?
-- An image viewer application used as basis to built out a modular application strcuture in plain JavaScript as an experiment to learn something more about JavaScript
+// Mount component
+var container = document.createElement('div');
+new MyComponent().render(container);
+```
 
 ### Focus:
 - The focus of this application is on building out a modular application structure with self-contained components
-- The main building blocks of the app is the Component, EventEmitter, ObjectUtil, ImageGrid and ImageViwer
+- The main building blocks of the app is the [Component.js](https://github.com/mlunoe/component-js/blob/master/app/components/Component/Component.js), [EventEmitter.js](https://github.com/mlunoe/component-js/blob/master/app/events/EventEmitter.js) and [ObjectUtil.js](https://github.com/mlunoe/component-js/blob/master/app/utils/ObjectUtil.js).
 
 ### Limitations
 - This application is built using only ES5, without Babel polyfill or any JavaScript framework or libraries
 - There is still some polish left to do there for it to be super appealing visually
-- Only a few essential parts of the app have been tested, like the Component, EventEmitter and ObjectUtil, but a lot of the visual parts needs tests
+- Only a few essential parts of the app have supporting unit tests, like the Component, EventEmitter and ObjectUtil, but a lot of the visual parts needs tests
 - Using JSONP, which is a hacky way of working around cross origin issues (it also has the problem of not being cancellable). This app should really have its own server to request content from
 - Missing to handle loading and errors for the image viewer, and thumbnail grid
 - If screen gets too wide compared to width (image ratio is 9/16), the image gets cut off at the bottom
