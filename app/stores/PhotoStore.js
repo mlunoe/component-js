@@ -27,27 +27,34 @@ function PhotoStore() {
       if (queryString) {
         query = '&tags=' + queryString;
       }
-      var url = baseUrl + '/feeds/photos_public.gne?format=json' + query;
-      RequestUtil.jsonp(url, 'jsonFlickrFeed', function (photos) {
-        images = photos.items.map(function (photo) {
-          // Reduce data to the format we want to store
-          return Object.keys(photo).reduce(function (memo, prop) {
-            if (transferProperties.indexOf(prop) > -1) {
-              memo[prop] = photo[prop];
-            }
 
-            if (typeof restructureProperties[prop] === 'function') {
-              var result = restructureProperties[prop](photo[prop]);
-              memo[result.prop] = result.value;
-            }
+      RequestUtil.fetch({
+        url: baseUrl + '/feeds/photos_public.gne?format=json' + query,
+        method: 'GET',
+        success: function (photos) {
+          images = photos.items.map(function (photo) {
+            // Reduce data to the format we want to store
+            return Object.keys(photo).reduce(function (memo, prop) {
+              if (transferProperties.indexOf(prop) > -1) {
+                memo[prop] = photo[prop];
+              }
 
-            return memo;
-          }, {});
-        });
+              if (typeof restructureProperties[prop] === 'function') {
+                var result = restructureProperties[prop](photo[prop]);
+                memo[result.prop] = result.value;
+              }
 
-        // Emit change event
-        this.emit(EventTypes.PHOTO_STORE_PHOTOS_CHANGE);
-      }.bind(this));
+              return memo;
+            }, {});
+          });
+
+          // Emit change event
+          this.emit(EventTypes.PHOTO_STORE_PHOTOS_CHANGE);
+        }.bind(this),
+        error: function (message) {
+          this.emit(EventTypes.PHOTO_STORE_PHOTOS_ERROR, message);
+        }.bind(this)
+      });
     },
 
     fetchLargePhoto: function (photoID) {
@@ -57,18 +64,24 @@ function PhotoStore() {
         return;
       }
 
-      var url =  baseUrl + '/rest/?method=flickr.photos.getSizes&api_key=5aa9a623bff2414e17acc8a5a4b894be&photo_id=' + photoID + '&format=json';
-      RequestUtil.jsonp(url, 'jsonFlickrApi', function (data) {
-        if (data.stat !== 'ok') {
-          this.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR, photoID);
-        }
-        data.sizes.size.forEach(function (photo) {
-          if (photo.label === 'Medium') {
-            largeImages[photoID] = {src: photo.source};
-            this.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, photoID);
+      RequestUtil.fetch({
+        url: baseUrl + '/rest/?method=flickr.photos.getSizes&api_key=5aa9a623bff2414e17acc8a5a4b894be&photo_id=' + photoID + '&format=json',
+        method: 'GET',
+        success: function (data) {
+          if (data.stat !== 'ok') {
+            this.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR, photoID);
           }
-        }, this);
-      }.bind(this));
+          data.sizes.size.forEach(function (photo) {
+            if (photo.label === 'Medium') {
+              largeImages[photoID] = {src: photo.source};
+              this.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, photoID);
+            }
+          }, this);
+        }.bind(this),
+        error: function (message) {
+          this.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR, message);
+        }.bind(this)
+      });
     },
 
     getPhotos: function () {

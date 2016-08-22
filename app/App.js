@@ -27,16 +27,22 @@ function App() {
           }
         }
       });
-
-      // Re-render image grid when requested
+      renderErrorHandler = this.renderError.bind(
+        this,
+        element.querySelector('.error-message')
+      );
       renderImageGridHandler = this.renderImageGrid.bind(
         this,
-        element.querySelector('.image-grid')
+        element.querySelector('.image-grid'),
+        renderErrorHandler
       );
+
 
       imageGrid.on(EventTypes.COMPONENT_CHANGE, renderImageGridHandler);
       // Re-render image grid when new photos are received
       PhotoStore.on(EventTypes.PHOTO_STORE_PHOTOS_CHANGE, renderImageGridHandler);
+      // Re-render error when new error is received
+      PhotoStore.on(EventTypes.PHOTO_STORE_PHOTOS_ERROR, renderErrorHandler);
       // Fetch photos on intial render
       PhotoStore.fetchPhotos(lastQuery);
     },
@@ -49,20 +55,36 @@ function App() {
         renderImageGridHandler
       );
       PhotoStore.removeChangeListener(
-        EventTypes.PHOTO_STORE_PHOTOS_CHANGE,
-        renderImageGridHandler
+        EventTypes.PHOTO_STORE_PHOTOS_ERROR,
+        renderErrorHandler
       );
     },
 
     /* View functions */
-    renderImageGrid: function (imageGridElement) {
+    renderImageGrid: function (imageGridElement, renderError) {
+      // Reset error message
+      renderError();
+      // Re-render image grid when requested
       imageGrid.render(imageGridElement);
+    },
+
+    renderError: function (errorElement, message) {
+      if (!message) {
+        errorElement.innerHTML = '';
+        return;
+      }
+      // Re-render error message when requested
+      errorElement.innerHTML =
+      '<p class="text-align-center primary">' +
+        message +
+      '</p>';
     },
 
     getView: function (props) {
       return (
         '<div class="app">' +
           '<div class="search-bar"></div>' +
+          '<div class="error-message"></div>' +
           '<div class="image-grid"></div>' +
         '</div>'
       );
