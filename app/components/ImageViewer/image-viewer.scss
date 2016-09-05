@@ -81,8 +81,9 @@
     cursor: pointer;
     display: inline-block;
     height: 50px;
-    right: 0;
     overflow: hidden;
+    right: 0;
+    top: 0;
     width: 50px;
 
     &:hover {
