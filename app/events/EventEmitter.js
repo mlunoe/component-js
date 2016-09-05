@@ -34,7 +34,7 @@ function EventEmitter() {
 
     /**
      * Subscribe to change fired by implementing component
-     * @param  {function} hander handler that is called on change
+     * @param  {Function} hander handler that is called on change
      */
     on: function (eventName, handler) {
       if (!eventName) {
@@ -64,7 +64,7 @@ function EventEmitter() {
 
     /**
      * Unsubscribe from change events fired by implementing component
-     * @param  {function} handler to remove from change events
+     * @param  {Function} handler to remove from change events
      */
     removeListener: function (eventName, handler) {
       if (!subscriptions[eventName]) {
