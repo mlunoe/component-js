@@ -70,9 +70,12 @@ function ImageGrid() {
     /* View functions */
     renderPhotoGrid: function (element, photos) {
       photos.forEach(function (props, index) {
-        var newProps = ObjectUtil.assign({}, props);
-        newProps.index = index;
-        newProps.className = 'grid-item';
+        var newProps = Object.keys(props).reduce(function (memo, key) {
+          memo[key] = props[key];
+
+          return memo;
+        }, {index: index, className: 'grid-item'});
+
         new Thumbnail().render(element, newProps);
       });
     },

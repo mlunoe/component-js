@@ -5,29 +5,6 @@ var ObjectUtil = require('../ObjectUtil');
 
 describe('ObjectUtil', function () {
 
-  describe('#assign()', function () {
-
-    it('error cases', function () {
-      expect(function () { ObjectUtil.assign(null); }).to.throw();
-      expect(function () { ObjectUtil.assign(undefined); }).to.throw();
-      expect(function () { ObjectUtil.assign(null, {}); }).to.throw();
-      expect(function () { ObjectUtil.assign(undefined, {}); }).to.throw();
-    });
-
-    it('merges objects', function () {
-      expect(ObjectUtil.assign({a: 'a'}, {b: 'b'})).to.deep.equal({a: 'a', b: 'b'});
-    });
-
-    it('overrides propeties of target', function () {
-      expect(ObjectUtil.assign({a: 'a'}, {a: 'b'})).to.deep.equal({a: 'b'});
-    });
-
-    it('copies over undefined values', function () {
-      expect(ObjectUtil.assign({a: 'a'}, {a: undefined})).to.deep.equal({a: undefined});
-    });
-
-  });
-
   describe('#inherits()', function () {
 
     describe('objects', function () {
@@ -86,6 +63,56 @@ describe('ObjectUtil', function () {
         var b = function () { return {b: 'b', shared: 'b\'s shared'}; };
         expect(ObjectUtil.inherits(a, b).shared).to.equal('a\'s shared');
         expect(ObjectUtil.inherits(a, b).__proto__.shared).to.equal('b\'s shared');
+      });
+
+    });
+
+    describe('propertiesObject', function () {
+
+      it('defaults to writable true', function () {
+        var a = {a: 'a'};
+        var b = {b: 'b'};
+        var result = ObjectUtil.inherits(a, b);
+        result.a = 'c';
+        expect(result.a).to.equal('c');
+      });
+
+      it('passed propertiesObject overrides writable', function () {
+        var a = {a: 'a'};
+        var b = {b: 'b'};
+        var result = ObjectUtil.inherits(a, b, {writable: false});
+        result.a = 'c';
+        expect(result.a).to.equal('a');
+      });
+
+      it('defaults to enumerable true', function () {
+        var a = {a: 'a'};
+        var b = {b: 'b'};
+        var result = ObjectUtil.inherits(a, b);
+        expect(result.propertyIsEnumerable('a')).to.equal(true);
+      });
+
+      it('passed propertiesObject overrides enumerable', function () {
+        var a = {a: 'a'};
+        var b = {b: 'b'};
+        var result = ObjectUtil.inherits(a, b, {enumerable: false});
+        expect(result.propertyIsEnumerable('a')).to.equal(false);
+      });
+
+      it('defaults to configurable true', function () {
+        var a = {a: 'a'};
+        var b = {b: 'b'};
+        var result = ObjectUtil.inherits(a, b);
+        delete result.a;
+        expect(Object.prototype.hasOwnProperty.call(result, 'a')).to.equal(false);
+      });
+
+      it('passed propertiesObject overrides configurable', function () {
+        var a = {a: 'a'};
+        var b = {b: 'b'};
+        var result = ObjectUtil.inherits(a, b, {configurable: false});
+        delete result.a;
+        expect(Object.prototype.hasOwnProperty.call(result, 'a')).to.equal(true);
       });
 
     });

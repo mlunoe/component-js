@@ -3,8 +3,8 @@ var RequestUtil = {
   /**
    * Makes a request by adding a script tag to the body element with the src
    * attribute as the request url
-   * @param  {string} url to request
-   * @param  {string} callbackName name of callback
+   * @param  {String} url to request
+   * @param  {String} callbackName name of callback
    * @param  {Function} callback to be called when request returns
    */
   jsonp: function (url, callbackName, callback) {
