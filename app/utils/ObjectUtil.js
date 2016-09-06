@@ -1,19 +1,43 @@
 var ObjectUtil = {
   /**
+   * Polyfill from MDN
+   * Copies values of all enumerable own properties from one or more source
+   * objects to a target object. It will return the target object.
+   * @param  {object} target the object to copy to
+   * @param  {object} source(s) the object to copy from
+   * @return {object} the object with source properties copied to target.
+   */
+  assign: function (target) { // , ...source
+    if (target == null) {
+      throw new TypeError('Cannot convert undefined or null to object');
+    }
+
+    target = Object(target);
+    for (var index = 1; index < arguments.length; index++) {
+      var source = arguments[index];
+      if (source != null) {
+        for (var key in source) {
+          if (Object.prototype.hasOwnProperty.call(source, key)) {
+            target[key] = source[key];
+          }
+        }
+      }
+    }
+
+    return target;
+  },
+
+  /**
    * Creates a new object with properties from ChildInstance and
    * adds ParentInstance as the prototype object.
-   * @param  {{Object|Function}} ChildInstance properties to have on
+   * @param  {{object|function}} ChildInstance properties to have on
    * newly created object
-   * @param  {{Object|Function}} ParentInstance prototype to have on
+   * @param  {{object|function}} ParentInstance prototype to have on
    * newly created object
-   * @param  {{Object}} propertiesObject Optional. An object whose enumerable
-   * own properties specify property descriptors to be added to the
-   * newly-created object
-   * @return {Object} the object with ChildInstance properties
+   * @return {object} the object with ChildInstance properties
    * and ParentInstance protoype.
    */
-  inherits: function (ChildInstance, ParentInstance, propertiesObject) {
-    propertiesObject || (propertiesObject = {});
+  inherits: function (ChildInstance, ParentInstance) {
     var parentInstance = ParentInstance;
     var childInstance = ChildInstance;
 
@@ -25,18 +49,7 @@ var ObjectUtil = {
       childInstance = new ChildInstance();
     }
 
-    var properties = Object.keys(childInstance).reduce(function (memo, key) {
-      memo[key] = {
-        value: childInstance[key],
-        writable: propertiesObject.writable !== false, // default to true
-        enumerable: propertiesObject.enumerable !== false, // default to true
-        configurable: propertiesObject.configurable !== false // default to true
-      };
-
-      return memo;
-    }.bind(this), {});
-
-    return Object.create(parentInstance, properties);
+    return this.assign(Object.create(parentInstance), childInstance);
   }
 };
 
