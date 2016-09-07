@@ -24,7 +24,7 @@ if (!global.window.localStorage) {
 propagateToGlobal(win);
 
 // from mocha-jsdom https://github.com/rstacruz/mocha-jsdom/blob/master/index.js#L80
-function propagateToGlobal (window) {
+function propagateToGlobal(window) {
   for (var key in window) {
     if (!window.hasOwnProperty(key)) continue;
     if (key in global) continue;

@@ -1,5 +1,6 @@
+'use strict';
+
 var expect = require('chai').expect;
-var sinon = require('sinon');
 
 var PhotoStore = require('../../../stores/PhotoStore');
 var ImageGrid = require('../ImageGrid');
@@ -10,7 +11,6 @@ describe('ImageGrid', function () {
   var originalGetPhotos = PhotoStore.getPhotos;
 
   beforeEach(function () {
-    spy = sinon.spy();
     imageGrid = new ImageGrid();
 
     PhotoStore.getPhotos = function () {

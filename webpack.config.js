@@ -67,10 +67,15 @@ module.exports = {
 				// 	presets: ['es2015'] // 'react-hot'
 				// }
 			// },
+      {
+        test: /\.js$/,
+        loader: 'strict'
+      },
 			// SCSS loader
 			{
         test: /\.scss$/,
-        loader: "style-loader!css-loader?sourceMap!postcss-loader!sass-loader?sourceMap"
+        exclude: 'node_modules',
+        loader: 'style-loader!css-loader?sourceMap!postcss-loader!sass-loader?sourceMap'
       },
       // File loaders for bootstrap fonts
       {
