@@ -28,28 +28,28 @@ var ObjectUtil = {
   },
 
   /**
-   * Creates a new object with properties from ChildInstance and
-   * adds ParentInstance as the prototype object.
-   * @param  {{object|function}} ChildInstance properties to have on
+   * Creates a new object with properties from Child and
+   * adds Parent as the prototype object.
+   * @param  {{Object|Function}} Child properties to have on
    * newly created object
-   * @param  {{object|function}} ParentInstance prototype to have on
+   * @param  {{Object|Function}} Parent prototype to have on
    * newly created object
-   * @return {object} the object with ChildInstance properties
-   * and ParentInstance protoype.
+   * @return {Object} the object with Child properties
+   * and Parent protoype.
    */
-  inherits: function (ChildInstance, ParentInstance) {
-    var parentInstance = ParentInstance;
-    var childInstance = ChildInstance;
+  inherits: function (Child, Parent) {
+    var parent = Parent;
+    var child = Child;
 
-    if (typeof ParentInstance === 'function') {
-      parentInstance = new ParentInstance();
+    if (typeof Parent === 'function') {
+      parent = new Parent();
     }
 
-    if (typeof ChildInstance === 'function') {
-      childInstance = new ChildInstance();
+    if (typeof Child === 'function') {
+      child = new Child();
     }
 
-    return this.assign(Object.create(parentInstance), childInstance);
+    return this.assign(Object.create(parent), child);
   }
 };
 
