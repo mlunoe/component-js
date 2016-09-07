@@ -13,6 +13,7 @@ describe('Component', function () {
   beforeEach(function () {
     component = ObjectUtil.inherits({
       componentDidMount: sinon.spy(),
+      componentDidUpdate: sinon.spy(),
       componentWillUnmount: sinon.spy(),
       getView: function () {
         return '<div class="component">My Component</div>'
@@ -77,10 +78,30 @@ describe('Component', function () {
     });
 
     it('passes through arguments to componentDidMount', function () {
+      component = ObjectUtil.inherits({
+        componentDidMount: sinon.spy(),
+        componentDidUpdate: sinon.spy(),
+        componentWillUnmount: sinon.spy(),
+        getView: function () {
+          return '<div class="component">My Component</div>'
+        }
+      }, Component);
       component.render(div, 'one', 'two', 'three');
-      expect(component.componentDidMount.getCall(1).args[1]).to.equal('one')
-      expect(component.componentDidMount.getCall(1).args[2]).to.equal('two')
-      expect(component.componentDidMount.getCall(1).args[3]).to.equal('three')
+      expect(component.componentDidMount.getCall(0).args[1]).to.equal('one')
+      expect(component.componentDidMount.getCall(0).args[2]).to.equal('two')
+      expect(component.componentDidMount.getCall(0).args[3]).to.equal('three')
+    });
+
+    it('calls componentDidUpdate if implemented', function () {
+      component.render(div);
+      expect(component.componentDidUpdate.calledOnce).to.equal(true);
+    });
+
+    it('passes through arguments to componentDidUpdate', function () {
+      component.render(div, 'one', 'two', 'three');
+      expect(component.componentDidUpdate.getCall(0).args[1]).to.equal('one')
+      expect(component.componentDidUpdate.getCall(0).args[2]).to.equal('two')
+      expect(component.componentDidUpdate.getCall(0).args[3]).to.equal('three')
     });
 
   });

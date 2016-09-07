@@ -5,6 +5,46 @@ var PhotoStore = require('../../stores/PhotoStore');
 var KeyboardUtil = require('../../utils/KeyboardUtil');
 var ObjectUtil = require('../../utils/ObjectUtil');
 
+var getPhotoID = function (link) {
+  var segments = link.split('/');
+  var id = segments.pop()
+  while (!id) {
+    id = segments.pop();
+  }
+
+  return id;
+};
+
+var handleImageEvent = function (element, props, event) {
+  var keyCodes = KeyboardUtil.keyCodes;
+  var keyCode = event.keyCode;
+  var dataset = event.target.dataset;
+  var onLeftClick = props.onLeftClick;
+  var onRightClick = props.onRightClick;
+  var onClose = props.onClose;
+
+  // Handle change image left
+  if (typeof onLeftClick === 'function' && dataset.direction === 'left' ||
+    keyCode === keyCodes.leftArrow) {
+    onLeftClick(event);
+  }
+
+  // Handle change image right
+  if (typeof onRightClick === 'function' && dataset.direction === 'right' ||
+    keyCode === keyCodes.rightArrow) {
+    onRightClick(event);
+  }
+
+  // Handle close viewer
+  if (dataset.close === 'true' || keyCode === keyCodes.esc) {
+    // Remove class to animate. Call close when animation is done
+    element.classList.remove('show');
+    setTimeout(function () {
+      onClose(event);
+    }, 200);
+  }
+};
+
 function ImageViewer() {
   var image = new Image();
   var imageEventHandler;
@@ -13,48 +53,12 @@ function ImageViewer() {
   var imageProps;
   var keyPressListenerAttached = false;
 
-  // Helper method to call provided handler if necessary
-  var callHandler = function (prop, value, keyCode, handler, event) {
-    if (typeof handler === 'function' &&
-      (event.target.dataset[prop] === value || event.keyCode === keyCode)) {
-      handler(event);
-    }
-  }
-
-  var getPhotoID = function (link) {
-    var segments = link.split('/');
-    var id = segments.pop()
-    while (!id) {
-      id = segments.pop();
-    }
-
-    return id;
-  }
-
-  var handleImageEvent = function (element, props, event) {
-    var keyCodes = KeyboardUtil.keyCodes;
-    // Handle change image left
-    callHandler('direction', 'left', keyCodes.leftArrow, props.onLeftClick, event);
-
-    // Handle change image right
-    callHandler('direction', 'right', keyCodes.rightArrow, props.onRightClick, event);
-
-    // Handle close viewer
-    callHandler('close', 'true', keyCodes.esc, function () {
-      // Remove class to animate. Call close when animation is done
-      element.classList.remove('show');
-      setTimeout(function () {
-        props.onClose(event);
-      }, 200);
-    }, event);
-  };
-
   return ObjectUtil.inherits({
     componentDidMount: function (element, props) {
       // Set event handlers
       imageEventHandler = handleImageEvent.bind(this, element, props);
-      element.onclick = imageEventHandler
-      // Viewre is opening
+      element.onclick = imageEventHandler;
+      // Viewer is opening
       if (props.child && !keyPressListenerAttached) {
         keyPressListenerAttached = true;
         global.window.addEventListener('keydown', imageEventHandler, true);
@@ -68,6 +72,10 @@ function ImageViewer() {
       }
 
       // TODO: Handle start loading
+      this.componentDidUpdate(element, props);
+    },
+
+    componentDidUpdate: function (element, props) {
       photoID = getPhotoID(props.child.link);
       imageRenderHandler = this.renderImage.bind(
         this,

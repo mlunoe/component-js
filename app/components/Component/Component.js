@@ -12,6 +12,10 @@
  *       // Do something with element after mount
  *     },
  *
+ *     componentDidUpdate() {
+ *       // Do something on component update
+ *     },
+ *
  *     componentWillUnmount() {
  *       // Clean up component
  *     },
@@ -37,6 +41,7 @@ function Component() {
     /**
      * Function to call when component should render into parent node
      * Calls componentDidMount when node has mounted
+     * Calls componentDidUpdate when node was updated
      * @param  {DOM Node} parentElement to render component within
      */
     render: function (parentElement) { // , ...props
@@ -68,13 +73,20 @@ function Component() {
         parentElement.appendChild(newElement);
       }
 
-      // Store our new instance
-      element = newElement;
-
-      if (typeof this.componentDidMount === 'function') {
-        var args = [element].concat(props);
+      // Call did mount
+      if (!element && typeof this.componentDidMount === 'function') {
+        var args = [newElement].concat(props);
         this.componentDidMount.apply(this, args);
       }
+
+      // Call did update
+      if (element && typeof this.componentDidUpdate === 'function') {
+        var args = [newElement].concat(props);
+        this.componentDidUpdate.apply(this, args);
+      }
+
+      // Store our new instance
+      element = newElement;
     },
 
     /**

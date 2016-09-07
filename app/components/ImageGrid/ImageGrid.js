@@ -14,6 +14,10 @@ function ImageGrid() {
   return ObjectUtil.inherits({
     /* Lifecycle methods */
     componentDidMount: function (element) {
+      this.componentDidUpdate(element);
+    },
+
+    componentDidUpdate: function (element) {
       element.onclick = this.handleImageClick.bind(this, element.querySelector('.selected-image'));
       var photos = PhotoStore.getPhotos();
       this.renderPhotoGrid(element.querySelector('.grid'), photos);

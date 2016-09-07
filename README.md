@@ -29,6 +29,10 @@ module.exports = function MyComponent() {
       // Do something with element after mount
     },
 
+    componentDidUpdate() {
+      // Do something on component update
+    },
+
     componentWillUnmount() {
       // Clean up component
     },
