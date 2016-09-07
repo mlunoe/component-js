@@ -17,6 +17,9 @@ open http://localhost:8080
 
 See it running here [http://mlunoe.github.io/component-js](http://mlunoe.github.io/component-js)
 
+<img src="https://raw.githubusercontent.com/mlunoe/component-js/235dae2388bcdb90b101a595b165690e7c3f22c4/screenshots/image-viewer.png" width="50%" />
+
+Example usage of [Component.js](https://github.com/mlunoe/component-js/blob/master/app/components/Component/Component.js):
 ```js
 var Component = require('../Component/Component');
 var ObjectUtil = require('./utils/ObjectUtil');
