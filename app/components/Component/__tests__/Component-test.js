@@ -77,7 +77,7 @@ describe('Component', function () {
       expect(component.componentDidMount.calledOnce).to.equal(true);
     });
 
-    it('passes through arguments to componentDidMount', function () {
+    it('makes props available for componentDidMount', function () {
       component = ObjectUtil.inherits({
         componentDidMount: sinon.spy(),
         componentDidUpdate: sinon.spy(),
@@ -86,10 +86,9 @@ describe('Component', function () {
           return '<div class="component">My Component</div>'
         }
       }, Component);
-      component.render(div, 'one', 'two', 'three');
-      expect(component.componentDidMount.getCall(0).args[1]).to.equal('one')
-      expect(component.componentDidMount.getCall(0).args[2]).to.equal('two')
-      expect(component.componentDidMount.getCall(0).args[3]).to.equal('three')
+      component.render(div, {one: 'one', two: 'two', three: 'three'});
+      expect(component.props)
+        .to.deep.equal({one: 'one', two: 'two', three: 'three'});
     });
 
     it('calls componentDidUpdate if implemented', function () {
@@ -97,11 +96,10 @@ describe('Component', function () {
       expect(component.componentDidUpdate.calledOnce).to.equal(true);
     });
 
-    it('passes through arguments to componentDidUpdate', function () {
-      component.render(div, 'one', 'two', 'three');
-      expect(component.componentDidUpdate.getCall(0).args[1]).to.equal('one')
-      expect(component.componentDidUpdate.getCall(0).args[2]).to.equal('two')
-      expect(component.componentDidUpdate.getCall(0).args[3]).to.equal('three')
+    it('makes props available for componentDidUpdate', function () {
+      component.render(div, {one: 'one', two: 'two', three: 'three'});
+      expect(component.props)
+        .to.deep.equal({one: 'one', two: 'two', three: 'three'});
     });
 
   });

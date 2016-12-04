@@ -10,33 +10,29 @@ var Thumbnail = require('./components/Thumbnail/Thumbnail');
 function App() {
   var imageGrid = new ImageGrid();
   var searchBar = new SearchBar();
-  var selectedImage;
-  var renderImageGridHandler;
   var lastQuery = '';
 
   return ObjectUtil.inherits({
     /* Lifecycle methods */
-    componentDidMount: function (element) {
+    componentDidMount: function () {
       // Fetch new photos on input change
-      searchBar.render(element.querySelector('.search-bar'), {
+      searchBar.render(this.getElement().querySelector('.search-bar'), {
         onChange: function () {
           // Don't re-fetch unless we have a new query
           if (lastQuery !== this.value) {
             PhotoStore.fetchPhotos(this.value);
             lastQuery = this.value;
           }
-        }
+        }.bind(this)
       });
 
-      // Re-render image grid when requested
-      renderImageGridHandler = this.renderImageGrid.bind(
-        this,
-        element.querySelector('.image-grid')
-      );
+      // Ensure context is this in handlers
+      this.renderImageGrid = this.renderImageGrid.bind(this);
 
-      imageGrid.on(EventTypes.COMPONENT_CHANGE, renderImageGridHandler);
+      // Re-render image grid when requested
+      imageGrid.on(EventTypes.COMPONENT_CHANGE, this.renderImageGrid);
       // Re-render image grid when new photos are received
-      PhotoStore.on(EventTypes.PHOTO_STORE_PHOTOS_CHANGE, renderImageGridHandler);
+      PhotoStore.on(EventTypes.PHOTO_STORE_PHOTOS_CHANGE, this.renderImageGrid);
       // Fetch photos on intial render
       PhotoStore.fetchPhotos(lastQuery);
     },
@@ -46,20 +42,20 @@ function App() {
       // but always good practise to clean up after our selves
       imageGrid.removeChangeListener(
         EventTypes.PHOTO_STORE_PHOTOS_CHANGE,
-        renderImageGridHandler
+        this.renderImageGrid
       );
       PhotoStore.removeChangeListener(
         EventTypes.PHOTO_STORE_PHOTOS_CHANGE,
-        renderImageGridHandler
+        this.renderImageGrid
       );
     },
 
     /* View functions */
-    renderImageGrid: function (imageGridElement) {
-      imageGrid.render(imageGridElement);
+    renderImageGrid: function () {
+      imageGrid.render(this.getElement().querySelector('.image-grid'));
     },
 
-    getView: function (props) {
+    getView: function () {
       return (
         '<div class="app">' +
           '<div class="search-bar"></div>' +
