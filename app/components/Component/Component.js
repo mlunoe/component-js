@@ -8,12 +8,12 @@
  *   // Private scope
  *
  *   return ObjectUtil.inherits({
- *     componentDidMount(element) {
- *       // Do something with element after mount
+ *     componentDidMount() {
+ *       // Do something with this.getElement() after mount
  *     },
  *
  *     componentDidUpdate() {
- *       // Do something on component update
+ *       // Do something  with this.getElement() on component update
  *     },
  *
  *     componentWillUnmount() {
@@ -38,19 +38,31 @@ function Component() {
 
   return {
     // Public API
+    props: {},
+    /**
+     * Returns current attached element
+     * @return {DOMElement} current attached DOMElement for component
+     */
+    getElement: function () {
+      return element;
+    },
     /**
      * Function to call when component should render into parent node
      * Calls componentDidMount when node has mounted
      * Calls componentDidUpdate when node was updated
      * @param  {DOM Node} parentElement to render component within
+     * @param  {Object} properties passed from render caller
      */
-    render: function (parentElement) { // , ...props
-      var props = Array.prototype.slice.call(arguments, 1);
+    render: function (parentElement, props) {
+      this.props = props || {};
+
       // Create temporary node to set innerHTML in
       var tempNode = document.createElement('div');
-      tempNode.innerHTML = this.getView.apply(this, props);
-      // Get the first child of temporary node, i.e. our view
+      tempNode.innerHTML = this.getView();
+      // Get the first child of temporary node, i.e. our view and
+      // store our new instance, and this before we get the view
       var newElement = tempNode.firstChild;
+
       // Rendering into new parent, unmount this element, so we can create a new
       if (element && parentElement !== element.parentNode) {
         this.unmount();
@@ -61,7 +73,7 @@ function Component() {
         // Handle consecutive renders
         /*
          * Replace this line with:
-         * `dd.apply(element, dd.diff(element, newElement));`
+         * `dd.apply(element, dd.diff(element, element));`
          * from https://github.com/fiduswriter/diffDOM to create a mini version
          * of React
          */
@@ -72,21 +84,19 @@ function Component() {
         // Handle first render
         parentElement.appendChild(newElement);
       }
+      // Store reference to element to be removed
+      var oldElement = element;
+      element = newElement;
 
       // Call did mount
-      if (!element && typeof this.componentDidMount === 'function') {
-        var args = [newElement].concat(props);
-        this.componentDidMount.apply(this, args);
+      if (!oldElement && typeof this.componentDidMount === 'function') {
+        this.componentDidMount();
       }
 
       // Call did update
-      if (element && typeof this.componentDidUpdate === 'function') {
-        var args = [newElement].concat(props);
-        this.componentDidUpdate.apply(this, args);
+      if (oldElement && typeof this.componentDidUpdate === 'function') {
+        this.componentDidUpdate();
       }
-
-      // Store our new instance
-      element = newElement;
     },
 
     /**

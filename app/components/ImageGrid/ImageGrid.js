@@ -13,14 +13,21 @@ function ImageGrid() {
 
   return ObjectUtil.inherits({
     /* Lifecycle methods */
-    componentDidMount: function (element) {
-      this.componentDidUpdate(element);
+    componentDidMount: function () {
+      // Ensure context is this in handlers
+      this.handleImageClick = this.handleImageClick.bind(this);
+      this.handleImageViewerClose = this.handleImageViewerClose.bind(this);
+      this.handleImageViewerLeftClick =
+        this.handleImageViewerLeftClick.bind(this);
+      this.handleImageViewerRightClick =
+        this.handleImageViewerRightClick.bind(this);
+
+      this.componentDidUpdate();
     },
 
-    componentDidUpdate: function (element) {
-      element.onclick = this.handleImageClick.bind(this, element.querySelector('.selected-image'));
-      var photos = PhotoStore.getPhotos();
-      this.renderPhotoGrid(element.querySelector('.grid'), photos);
+    componentDidUpdate: function () {
+      this.getElement().onclick = this.handleImageClick;
+      this.renderPhotoGrid();
     },
 
     componentWillUnmount: function () {
@@ -28,22 +35,23 @@ function ImageGrid() {
     },
 
     /* Event handlers */
-    handleImageClick: function (element, event) {
+    handleImageClick: function () {
       var index = parseInt(event.target.dataset.index, 10);
       if (!isNaN(index)) {
         shouldAnimateIn = true;
         selectedImage = index;
-        this.renderSelectedImage(element, PhotoStore.getPhotos());
+        this.renderSelectedImage();
       }
     },
 
-    handleImageViewerClose: function (element) {
+    handleImageViewerClose: function () {
       shouldAnimateIn = true;
       selectedImage = undefined;
-      this.renderSelectedImage(element, PhotoStore.getPhotos());
+      this.renderSelectedImage();
     },
 
-    handleImageViewerLeftClick: function (element, photos, event) {
+    handleImageViewerLeftClick: function (event) {
+      var photos = PhotoStore.getPhotos();
       // Should do nothing if the key event was already consumed,
       // or there is only one or no photos
       if (event.defaultPrevented || !photos || photos.length < 2) {
@@ -55,10 +63,11 @@ function ImageGrid() {
       }
 
       shouldAnimateIn = false;
-      this.renderSelectedImage(element, PhotoStore.getPhotos());
+      this.renderSelectedImage();
     },
 
-    handleImageViewerRightClick: function (element, photos, event) {
+    handleImageViewerRightClick: function (event) {
+      var photos = PhotoStore.getPhotos();
       // Should do nothing if the key event was already consumed,
       // or there is only one or no photos
       if (event.defaultPrevented || !photos || photos.length < 2) {
@@ -68,12 +77,13 @@ function ImageGrid() {
       // Add before the modulus operator and use modulus as a circular buffer
       selectedImage = ++selectedImage % photos.length;
       shouldAnimateIn = false;
-      this.renderSelectedImage(element, PhotoStore.getPhotos());
+      this.renderSelectedImage();
     },
 
     /* View functions */
-    renderPhotoGrid: function (element, photos) {
-      photos.forEach(function (props, index) {
+    renderPhotoGrid: function () {
+      var element = this.getElement().querySelector('.grid');
+      PhotoStore.getPhotos().forEach(function (props, index) {
         var newProps = ObjectUtil.assign({}, props);
         newProps.index = index;
         newProps.className = 'grid-item';
@@ -81,7 +91,9 @@ function ImageGrid() {
       });
     },
 
-    renderSelectedImage: function (element, photos) {
+    renderSelectedImage: function () {
+      var photos = PhotoStore.getPhotos();
+      var element = this.getElement().querySelector('.selected-image');
       if (!element || !photos.length) {
         return;
       }
@@ -93,24 +105,23 @@ function ImageGrid() {
         return;
       }
 
-      var props = {
+      imageViewer.render(element, {
         backdropClose: true,
-        onLeftClick: this.handleImageViewerLeftClick.bind(this, element, photos),
-        onRightClick: this.handleImageViewerRightClick.bind(this, element, photos),
-        onClose: this.handleImageViewerClose.bind(this, element),
+        onLeftClick: this.handleImageViewerLeftClick,
+        onRightClick: this.handleImageViewerRightClick,
+        onClose: this.handleImageViewerClose,
         child: selectedChild,
         shouldAnimateIn: shouldAnimateIn
-      };
-
-      imageViewer.render(element, props);
+      });
     },
 
-    getView: function (props) {
+    getView: function () {
       var noImagesMessage = '';
       if (!PhotoStore.getPhotos().length) {
         noImagesMessage = (
           '<p class="text-align-center primary">' +
-            'Sorry, no images was found from that search. Please try another search.' +
+            'Sorry, no images was found from that search. ' +
+            'Please try another search.' +
           '</p>'
         );
       }

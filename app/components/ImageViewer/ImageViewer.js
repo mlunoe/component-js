@@ -15,77 +15,55 @@ var getPhotoID = function (link) {
   return id;
 };
 
-var handleImageEvent = function (element, props, event) {
-  var keyCodes = KeyboardUtil.keyCodes;
-  var keyCode = event.keyCode;
-  var dataset = event.target.dataset;
-  var onLeftClick = props.onLeftClick;
-  var onRightClick = props.onRightClick;
-  var onClose = props.onClose;
-
-  // Handle change image left
-  if (typeof onLeftClick === 'function' && dataset.direction === 'left' ||
-    keyCode === keyCodes.leftArrow) {
-    onLeftClick(event);
-  }
-
-  // Handle change image right
-  if (typeof onRightClick === 'function' && dataset.direction === 'right' ||
-    keyCode === keyCodes.rightArrow) {
-    onRightClick(event);
-  }
-
-  // Handle close viewer
-  if (dataset.close === 'true' || keyCode === keyCodes.esc) {
-    // Remove class to animate. Call close when animation is done
-    element.classList.remove('show');
-    setTimeout(function () {
-      onClose(event);
-    }, 200);
-  }
-};
-
 function ImageViewer() {
   var image = new Image();
-  var imageEventHandler;
-  var imageRenderHandler;
   var photoID;
   var imageProps;
   var keyPressListenerAttached = false;
 
   return ObjectUtil.inherits({
-    componentDidMount: function (element, props) {
+    /* Lifecycle methods */
+    componentDidMount: function () {
+      // Ensure context is this in handlers
+      this.handleImageEvent = this.handleImageEvent.bind(this);
+      this.renderImage = this.renderImage.bind(this);
+      this.renderError = this.renderError.bind(this);
+
       // Set event handlers
-      imageEventHandler = handleImageEvent.bind(this, element, props);
-      element.onclick = imageEventHandler;
+      this.getElement().onclick = this.handleImageEvent;
       // Viewer is opening
-      if (props.child && !keyPressListenerAttached) {
+      if (this.props.child && !keyPressListenerAttached) {
         keyPressListenerAttached = true;
-        global.window.addEventListener('keydown', imageEventHandler, true);
+        global.window.addEventListener('keydown', this.handleImageEvent, true);
       }
 
       // Add show class in next render cycle to animate in
-      if (props.shouldAnimateIn) {
+      if (this.props.shouldAnimateIn) {
         setTimeout(function () {
-          element.classList.add('show');
-        }, 100);
+          this.getElement().classList.add('show');
+        }.bind(this), 100);
       }
 
       // TODO: Handle start loading
-      this.componentDidUpdate(element, props);
+      this.componentDidUpdate();
     },
 
-    componentDidUpdate: function (element, props) {
-      photoID = getPhotoID(props.child.link);
-      element.onclick = imageEventHandler;
-      imageRenderHandler = this.renderImage.bind(
-        this,
-        element.querySelector('.display-image'),
-        props.child
+    componentDidUpdate: function () {
+      photoID = getPhotoID(this.props.child.link);
+      this.getElement().onclick = this.handleImageEvent;
+      // Clean up listeners
+      PhotoStore.removeListener(
+        EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
+        this.renderImage
       );
+      PhotoStore.removeListener(
+        EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR,
+        this.renderError
+      );
+      // Re-attach listeners
       PhotoStore.on(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
-        imageRenderHandler
+        this.renderImage
       );
       PhotoStore.on(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR,
@@ -97,31 +75,71 @@ function ImageViewer() {
     },
 
     componentWillUnmount: function () {
-      // Clean up listener
+      // Clean up listeners
       keyPressListenerAttached = false;
-      global.window.removeEventListener('keydown', imageEventHandler, true);
+      global.window.removeEventListener('keydown', this.handleImageEvent, true);
       PhotoStore.removeListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
-        imageRenderHandler
+        this.renderImage
+      );
+      PhotoStore.removeListener(
+        EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR,
+        this.renderError
       );
     },
 
-    renderImage: function (displayImageElement, photo, id) {
-      if (photoID === id) {
-        image.render(displayImageElement, {
-          src: PhotoStore.getLargePhoto(photoID).src,
-          // Transfer other information
-          title: photo.title,
-          link: photo.link
-        });
+    /* Event handlers */
+    handleImageEvent: function (event) {
+      var keyCodes = KeyboardUtil.keyCodes;
+      var keyCode = event.keyCode;
+      var dataset = event.target.dataset;
+      var onLeftClick = this.props.onLeftClick;
+      var onRightClick = this.props.onRightClick;
+      var onClose = this.props.onClose;
+
+      // Handle change image left
+      if (typeof onLeftClick === 'function' && dataset.direction === 'left' ||
+        keyCode === keyCodes.leftArrow) {
+        onLeftClick(event);
+      }
+
+      // Handle change image right
+      if (typeof onRightClick === 'function' && dataset.direction === 'right' ||
+        keyCode === keyCodes.rightArrow) {
+        onRightClick(event);
+      }
+
+      // Handle close viewer
+      if (dataset.close === 'true' || keyCode === keyCodes.esc) {
+        // Remove class to animate. Call close when animation is done
+        this.getElement().classList.remove('show');
+        setTimeout(function () {
+          onClose(event);
+        }, 200);
       }
     },
 
-    renderError: function (id) {
-      if (photoID === id) {
-        // TODO: Handle error
-        console.log('Image request error');
+    /* View functions */
+    renderImage: function (id) {
+      if (photoID !== id) {
+        return;
       }
+
+      image.render(this.getElement().querySelector('.display-image'), {
+        src: PhotoStore.getLargePhoto(photoID).src,
+        // Transfer other information
+        title: this.props.child.title,
+        link: this.props.child.link
+      });
+    },
+
+    renderError: function (id) {
+      if (photoID !== id) {
+        return;
+      }
+
+      // TODO: Handle error
+      console.log('Image request error');
     },
 
     getFooter: function () {
@@ -133,21 +151,25 @@ function ImageViewer() {
       );
     },
 
-    getView: function (props) {
+    getView: function () {
       var dataClose = '';
-      if (props.backdropClose) {
+      if (this.props.backdropClose) {
         dataClose = 'data-close="true"';
       }
 
       var imageViewerBackdropClasses = 'image-viewer-backdrop';
-      if (!props.shouldAnimateIn) {
+      if (!this.props.shouldAnimateIn) {
         imageViewerBackdropClasses += ' show';
       }
 
-      var child = props.child;
+      var child = this.props.child;
       var title = '';
       if (child) {
-        title = '<p class="text-white text-align-center">' + child.title + '<p/>';
+        title = (
+          '<p class="text-white text-align-center">' +
+            child.title +
+          '<p/>'
+        );
       }
 
       return (
