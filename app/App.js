@@ -23,7 +23,7 @@ function App() {
             PhotoStore.fetchPhotos(this.value);
             lastQuery = this.value;
           }
-        }.bind(this)
+        }
       });
 
       // Ensure context is this in handlers
