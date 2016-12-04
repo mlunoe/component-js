@@ -27,7 +27,7 @@ function PhotoStore() {
       if (queryString) {
         query = '&tags=' + queryString;
       }
-      var url = baseUrl + '/feeds/photos_public.gne?format=json' + query;
+      var url = baseUrl + '/feeds/photos_public.gne?format=json&safe_search=3' + query;
       RequestUtil.jsonp(url, 'jsonFlickrFeed', function (photos) {
         images = photos.items.map(function (photo) {
           // Reduce data to the format we want to store
