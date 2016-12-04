@@ -77,6 +77,7 @@ function ImageViewer() {
 
     componentDidUpdate: function (element, props) {
       photoID = getPhotoID(props.child.link);
+      element.onclick = imageEventHandler;
       imageRenderHandler = this.renderImage.bind(
         this,
         element.querySelector('.display-image'),
