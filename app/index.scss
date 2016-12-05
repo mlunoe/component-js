@@ -9,6 +9,7 @@ $pink: #ff1493;
 @import './components/Thumbnail/thumbnail';
 @import './components/ImageViewer/image-viewer';
 @import './components/ImageGrid/image-grid';
+@import './components/Loader/loader';
 @import './components/SearchBar/search-bar';
 
 * {
@@ -40,4 +41,8 @@ body {
 
 .primary {
   color: $pink;
+}
+
+.hidden {
+  display: none !important;
 }

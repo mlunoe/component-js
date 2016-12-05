@@ -90,6 +90,8 @@ function ImageViewer() {
 
     /* Event handlers */
     handleImageEvent: function (event) {
+
+      var element = this.getElement();
       var keyCodes = KeyboardUtil.keyCodes;
       var keyCode = event.keyCode;
       var dataset = event.target.dataset;
@@ -109,10 +111,23 @@ function ImageViewer() {
         onRightClick(event);
       }
 
+      if (dataset.direction === 'left' || keyCode === keyCodes.leftArrow ||
+        dataset.direction === 'right' || keyCode === keyCodes.rightArrow) {
+        // Hide error message and display image
+        element.querySelector('.error-message').classList.remove('hidden');
+        element.querySelector('.display-image').classList.add('hidden');
+        var titleElm = element.querySelector('.title');
+        if (titleElm) {
+          titleElm.classList.add('hidden');
+        }
+        // Show loader
+        element.querySelector('.loader').classList.remove('hidden');
+      }
+
       // Handle close viewer
       if (dataset.close === 'true' || keyCode === keyCodes.esc) {
         // Remove class to animate. Call close when animation is done
-        this.getElement().classList.remove('show');
+        element.classList.remove('show');
         setTimeout(function () {
           onClose(event);
         }, 200);
@@ -125,7 +140,16 @@ function ImageViewer() {
         return;
       }
 
-      image.render(this.getElement().querySelector('.display-image'), {
+      var element = this.getElement();
+      element.querySelector('.loader').classList.add('hidden');
+      var imageElm = element.querySelector('.display-image');
+      imageElm.classList.remove('hidden');
+      var titleElm = element.querySelector('.title');
+      if (titleElm) {
+        titleElm.classList.remove('hidden');
+      }
+
+      image.render(imageElm, {
         src: PhotoStore.getLargePhoto(photoID).src,
         // Transfer other information
         title: this.props.child.title,
@@ -133,13 +157,19 @@ function ImageViewer() {
       });
     },
 
-    renderError: function (id) {
+    renderError: function (id, message) {
       if (photoID !== id) {
         return;
       }
-
-      // TODO: Handle error
-      console.log('Image request error');
+      var element = this.getElement();
+      element.querySelector('.loader').classList.add('hidden');
+      var titleElm = element.querySelector('.title');
+      if (titleElm) {
+        titleElm.classList.add('hidden');
+      }
+      var errorElement = element.querySelector('.error-message');
+      errorElement.classList.remove('hidden');
+      errorElement.innerHTML = message || 'Image request error';
     },
 
     getFooter: function () {
@@ -166,7 +196,7 @@ function ImageViewer() {
       var title = '';
       if (child) {
         title = (
-          '<p class="text-white text-align-center">' +
+          '<p class="title text-white text-align-center">' +
             child.title +
           '<p/>'
         );
@@ -176,7 +206,9 @@ function ImageViewer() {
         '<div ' + dataClose + ' class="' + imageViewerBackdropClasses +'">' +
           '<div class="image-viewer">' +
             '<span data-close="true" class="close-button"></span>' +
-            '<div class="display-image"></div>' +
+            '<div class="loader"><div></div><div></div><div></div></div>' +
+            '<p class="error-message primary hidden"></p>' +
+            '<div class="display-image hidden"></div>' +
             title +
             this.getFooter() +
           '</div>' +
