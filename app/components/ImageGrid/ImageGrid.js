@@ -53,8 +53,8 @@ function ImageGrid() {
     handleImageViewerLeftClick: function (event) {
       var photos = PhotoStore.getPhotos();
       // Should do nothing if the key event was already consumed,
-      // or there is only one or no photos
-      if (event.defaultPrevented || !photos || photos.length < 2) {
+      // or there are no photos
+      if (event.defaultPrevented || !photos) {
         return;
       }
 
@@ -69,8 +69,8 @@ function ImageGrid() {
     handleImageViewerRightClick: function (event) {
       var photos = PhotoStore.getPhotos();
       // Should do nothing if the key event was already consumed,
-      // or there is only one or no photos
-      if (event.defaultPrevented || !photos || photos.length < 2) {
+      // or there are no photos
+      if (event.defaultPrevented || !photos) {
         return;
       }
 
