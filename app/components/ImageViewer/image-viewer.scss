@@ -18,9 +18,14 @@
 }
 
 .image-viewer {
-  align-items: center;
   display: flex;
+  flex: 0 1 auto;
   flex-direction: column;
+  flex-grow: 1;
+  flex-shrink: 0;
+  height: 70vh;
+  width: 90vw;
+  align-items: center;
   justify-content: center;
   opacity: 0;
   transform: translateY(-25%);
@@ -32,9 +37,11 @@
   }
 
   .display-image {
-    max-width: 90vw;
-    max-height: 70vh;
     overflow: hidden;
+  }
+
+  .display-image,
+  .loader-container {
   }
 
   .arrow {
@@ -62,6 +69,7 @@
 
     &.right:before {
       left: 0;
+      margin-left: 45px;
       transform: rotate(45deg);
     }
 
@@ -72,6 +80,7 @@
 
     &.left:before {
       left: 2px;
+      margin-right: 45px;
       transform: rotate(-135deg);
     }
   }
