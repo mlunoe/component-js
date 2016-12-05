@@ -62,12 +62,15 @@ function PhotoStore() {
         if (data.stat !== 'ok') {
           this.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR, photoID);
         }
-        data.sizes.size.forEach(function (photo) {
-          if (photo.label === 'Medium') {
+
+        data.sizes.size.forEach(function (photo, index) {
+          // Get medium size or t
+          if (photo.label === 'Medium' ||
+            (largeImages[photoID] && index + 1 === data.sizes.length)) {
             largeImages[photoID] = {src: photo.source};
-            this.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, photoID);
           }
-        }, this);
+        });
+        this.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, photoID);
       }.bind(this));
     },
 
