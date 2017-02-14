@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
   "name": "component-js",
+  "version": "2.0.0",
   "description": "A minimal JavaScript (ES5) boilerplate for creating reusable components (Image Viewer Example) http://mlunoe.github.io/component-js",
   "main": "dist/index.js",
   "repository": {
