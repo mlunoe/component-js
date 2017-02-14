@@ -8,8 +8,8 @@
     "url": "https://github.com/mlunoe/webpack-babel-mocha-boilerplate"
   },
   "engines": {
-    "node": "4.4.x",
-    "npm": "3.9.x"
+    "node": "7.5.x",
+    "npm": "4.1.x"
   },
   "scripts": {
     "start": "NODE_ENV=development webpack-dev-server --dev-tool eval --progress --colors --hot --content-base build",
