@@ -1,106 +1,111 @@
 var autoprefixer = require('autoprefixer');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var webpack = require('webpack');
 var path = require('path');
-var resolve = function (dir) {
-	return path.resolve(__dirname, dir);
-};
+var webpack = require('webpack');
 
 /**
- * Default configuration
+ * Default (production) configuration
  */
 var devtool = 'source-map';
-var entry = [resolve('app/index.js')];
+var devServer;
+var entry = ['./index.js'];
+var context = path.resolve(__dirname, 'src');
 var output = {
-	path: resolve('dist'),
-	filename: 'index.js'
+  // Point output path to 'dist' by default (production)
+  path: path.resolve(__dirname, 'dist'),
+  // The output file location within path
+  filename: './index.js',
+  // Necessary for HMR to know where to load the hot update chunks
+  publicPath: '/'
 };
-var plugins = [
-	new HtmlWebpackPlugin({
-		append: true,
-		template: path.join(__dirname, 'build/index.html')
-	})
-];
-
-/**
- * Production configuration
- */
-if (process.env.NODE_ENV === 'production') {
-	// Make sure to optimize JavaScript
-	plugins.push(
-		new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.js')
-	);
-}
+var plugins = [];
 
 /**
  * Development configuration
  */
 if (process.env.NODE_ENV === 'development') {
-  // eval-source-map is the same thing as source-map,
-  // except with caching. Don't use in production.
-  devtool = 'eval-source-map';
+  devtool = 'inline-source-map';
 
-  // Add Webpack dev server
-  entry.push('webpack/hot/dev-server');
-  entry.push('webpack-dev-server/client?http://localhost:8080');
+  // Point development output path to 'build'
+  output.path = path.resolve(__dirname, 'build');
 
-	// Point development output path to 'build'
-	output.path = resolve('build');
+  devServer = {
+    // Enable HMR on the server
+    hot: true,
+    // Match the output path
+    contentBase: path.resolve(__dirname, 'build'),
+    // Match the output `publicPath`
+    publicPath: '/',
+    // Falls back to default which is 8080
+    port: process.env.PORT,
+    // Falls back to default which is localhost
+    host: process.env.IP
+  };
 
-	// Add hot module replace plugin for development
-	plugins.push(new webpack.HotModuleReplacementPlugin());
+  // Add hot module replace plugin for development
+  plugins.push(new webpack.HotModuleReplacementPlugin());
+
+  // Prints more readable module names in the browser console
+  // on hot module updates
+  plugins.push(new webpack.NamedModulesPlugin())
+}
+
+/**
+ * Production configuration
+ */
+if (process.env.NODE_ENV === 'production') {
+  // Production specific configuration, that are not overridden by development
 }
 
 module.exports = {
-	devtool: devtool,
-	entry: entry,
-	output: output,
-	plugins: plugins,
-	module: {
-		loaders: [
-			// JavaScript loader
-			// {
-			// 	test: /\.(js|jsx)$/,
-			// 	exclude: [resolve('node_modules')],
-				// loader: 'babel',
-				// query: {
-				// 	presets: ['es2015'] // 'react-hot'
-				// }
-			// },
+  entry: entry,
+  output: output,
+  context: context,
+  devtool: devtool,
+  devServer: devServer,
+  plugins: plugins,
+  module: {
+    rules: [
       {
         test: /\.js$/,
-        loader: 'strict'
+        // use: [{
+        //   loader: 'babel-loader',
+        //   options: {
+        //     sourceMap: true
+        //   }
+        // }],
+        exclude: /node_modules/
       },
-			// SCSS loader
-			{
-        test: /\.scss$/,
-        exclude: 'node_modules',
-        loader: 'style-loader!css-loader?sourceMap!postcss-loader!sass-loader?sourceMap'
-      },
-      // File loaders for bootstrap fonts
+      // Styles loader
       {
-      	test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
-      	loader: 'url?limit=10000&mimetype=application/font-woff'
+        test: /\.(sass|scss)$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'postcss-loader',
+            options: {
+              sourceMap: true,
+              plugins: function () {
+                return [autoprefixer];
+              }
+            }
+          },
+          'sass-loader'
+        ],
+        exclude: /node_modules/
       },
+      // File HTML loader
       {
-      	test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
-      	loader: 'url?limit=10000&mimetype=application/font-woff'
-      },
-      {
-      	test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-      	loader: 'url?limit=10000&mimetype=application/octet-stream'
-      },
-      {
-      	test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-      	loader: 'file'
-      },
-      {
-      	test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-      	loader: 'url?limit=10000&mimetype=image/svg+xml'
-    	}
-		]
-	},
-  postcss: function () {
-    return [autoprefixer];
+        test: /\.html$/,
+        use: [{
+          loader:'file-loader',
+          options: {
+            // Keep original name, don't obscure
+            name: '[name].[ext]'
+          }
+        }],
+        exclude: /node_modules/
+      }
+    ]
   }
 };
