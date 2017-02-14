@@ -1,11 +1,11 @@
-var Component = require('./components/Component/Component');
-var EventTypes = require('./constants/EventTypes');
-var FunctionUtil = require('./utils/FunctionUtil');
-var SearchBar = require('./components/SearchBar/SearchBar');
-var ImageGrid = require('./components/ImageGrid/ImageGrid');
-var ObjectUtil = require('./utils/ObjectUtil');
-var PhotoStore = require('./stores/PhotoStore');
-var Thumbnail = require('./components/Thumbnail/Thumbnail');
+var Component = require('../Component/Component');
+var EventTypes = require('../../constants/EventTypes');
+var FunctionUtil = require('../../utils/FunctionUtil');
+var SearchBar = require('../SearchBar/SearchBar');
+var ImageGrid = require('../ImageGrid/ImageGrid');
+var ObjectUtil = require('../../utils/ObjectUtil');
+var PhotoStore = require('../../stores/PhotoStore');
+var Thumbnail = require('../Thumbnail/Thumbnail');
 
 function App() {
   var imageGrid = new ImageGrid();
