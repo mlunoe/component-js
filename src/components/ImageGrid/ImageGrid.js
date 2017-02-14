@@ -26,16 +26,22 @@ function ImageGrid() {
     },
 
     componentDidUpdate: function () {
-      this.getElement().onclick = this.handleImageClick;
+      this.getElement().addEventListener('click', this.handleImageClick, false);
       this.renderPhotoGrid();
     },
 
     componentWillUnmount: function () {
-      // Nothing to clean up
+      var element = this.getElement();
+      if (!element) {
+        return;
+      }
+
+      // Clean up
+      element.removeEventListener('click', this.handleImageClick);
     },
 
     /* Event handlers */
-    handleImageClick: function () {
+    handleImageClick: function (event) {
       var index = parseInt(event.target.dataset.index, 10);
       if (!isNaN(index)) {
         shouldAnimateIn = true;

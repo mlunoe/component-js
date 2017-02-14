@@ -29,29 +29,30 @@ function ImageViewer() {
       this.renderImage = this.renderImage.bind(this);
       this.renderError = this.renderError.bind(this);
 
-      // Set event handlers
-      this.getElement().onclick = this.handleImageEvent;
       // Viewer is opening
       if (this.props.child && !keyPressListenerAttached) {
         keyPressListenerAttached = true;
+        // Set event handlers
         global.window.addEventListener('keydown', this.handleImageEvent, true);
       }
 
       // Add show class in next render cycle to animate in
       if (this.props.shouldAnimateIn) {
-        setTimeout(function () {
-          this.getElement().classList.add('show');
-        }.bind(this), 100);
+        var element = this.getElement();
+        if (element) {
+          setTimeout(function () {
+            element.classList.add('show');
+          }, 100);
+        }
       }
 
-      // TODO: Handle start loading
       this.componentDidUpdate();
     },
 
     componentDidUpdate: function () {
       photoID = getPhotoID(this.props.child.link);
-      this.getElement().onclick = this.handleImageEvent;
       // Clean up listeners
+      this.getElement().removeEventListener('click', this.handleImageEvent);
       PhotoStore.removeListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
         this.renderImage
@@ -61,6 +62,7 @@ function ImageViewer() {
         this.renderError
       );
       // Re-attach listeners
+      this.getElement().addEventListener('click', this.handleImageEvent, false);
       PhotoStore.on(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
         this.renderImage
@@ -77,7 +79,8 @@ function ImageViewer() {
     componentWillUnmount: function () {
       // Clean up listeners
       keyPressListenerAttached = false;
-      global.window.removeEventListener('keydown', this.handleImageEvent, true);
+      global.window.removeEventListener('keydown', this.handleImageEvent);
+      this.getElement().removeEventListener('click', this.handleImageEvent);
       PhotoStore.removeListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
         this.renderImage
