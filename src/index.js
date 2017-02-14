@@ -1,5 +1,6 @@
+require('./index.html');
 require('./index.scss');
-var App = require('./App');
+var App = require('./components/App/App');
 
 window.onload = function () {
   var container = document.createElement('div');
