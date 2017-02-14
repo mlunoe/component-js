@@ -1,11 +1,11 @@
 {
-  "name": "webpack-babel-mocha-boilerplate",
   "version": "1.0.0",
-  "description": "Webpack, Babel, Mocha + JSDOM boilerplate",
+  "name": "component-js",
+  "description": "A minimal JavaScript (ES5) boilerplate for creating reusable components (Image Viewer Example) http://mlunoe.github.io/component-js",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mlunoe/webpack-babel-mocha-boilerplate"
+    "url": "https://github.com/mlunoe/component-js"
   },
   "engines": {
     "node": "7.5.x",
