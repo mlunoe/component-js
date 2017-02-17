@@ -29,19 +29,19 @@ module.exports = function MyComponent() {
 
   return ObjectUtil.inherits({
     componentWillMount() {
-      // Do something before mount
+      // Do something with this.props before mount
     },
 
     componentDidMount() {
-      // Do something with this.getElement() after mount
+      // Do something with this.props and this.getElement() after mount
     },
 
     componentWillUpdate() {
-      // Do something before update
+      // Do something with this.props before update
     },
 
     componentDidUpdate() {
-      // Do something with this.getElement() on component update
+      // Do something with this.props and this.getElement() on update
     },
 
     componentWillUnmount() {
