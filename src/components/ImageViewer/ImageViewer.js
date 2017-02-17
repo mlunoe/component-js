@@ -24,20 +24,21 @@ function ImageViewer() {
   return ObjectUtil.inherits({
     /* Lifecycle methods */
     componentDidMount: function () {
+      var props = this.props;
       // Ensure context is this in handlers
       this.handleImageEvent = this.handleImageEvent.bind(this);
       this.renderImage = this.renderImage.bind(this);
       this.renderError = this.renderError.bind(this);
 
       // Viewer is opening
-      if (this.props.child && !keyPressListenerAttached) {
+      if (props.child && !keyPressListenerAttached) {
         keyPressListenerAttached = true;
         // Set event handlers
         global.window.addEventListener('keydown', this.handleImageEvent, true);
       }
 
       // Add show class in next render cycle to animate in
-      if (this.props.shouldAnimateIn) {
+      if (props.shouldAnimateIn) {
         var element = this.getElement();
         if (element) {
           setTimeout(function () {
@@ -108,12 +109,13 @@ function ImageViewer() {
         return;
       }
 
+      var props = this.props;
       var keyCodes = KeyboardUtil.keyCodes;
       var keyCode = event.keyCode;
       var dataset = event.target.dataset;
-      var onLeftClick = this.props.onLeftClick;
-      var onRightClick = this.props.onRightClick;
-      var onClose = this.props.onClose;
+      var onLeftClick = props.onLeftClick;
+      var onRightClick = props.onRightClick;
+      var onClose = props.onClose;
 
       // Handle change image left
       if (typeof onLeftClick === 'function' && dataset.direction === 'left' ||
@@ -152,9 +154,15 @@ function ImageViewer() {
 
     /* View functions */
     renderImage: function (id) {
+      var child = this.props.child;
       if (photoID !== id) {
         return;
       }
+      var photo = PhotoStore.getLargePhoto(photoID);
+      if (!photo || !photo.src) {
+        return;
+      }
+
 
       var element = this.getElement();
       element.querySelector('.loader').classList.add('hidden');
@@ -166,10 +174,10 @@ function ImageViewer() {
       }
 
       image.render(imageElm, {
-        src: PhotoStore.getLargePhoto(photoID).src,
+        src: photo.src,
         // Transfer other information
-        title: this.props.child.title,
-        link: this.props.child.link
+        title: child.title,
+        link: child.link
       });
     },
 
@@ -198,19 +206,23 @@ function ImageViewer() {
     },
 
     getView: function () {
+      var props = this.props;
+      var backdropClose = props.backdropClose;
+      var child = props.child;
+      var shouldAnimateIn = props.shouldAnimateIn;
+
       var dataClose = '';
-      if (this.props.backdropClose) {
+      if (backdropClose) {
         dataClose = 'data-close="true"';
       }
 
       var imageViewerBackdropClasses = 'image-viewer-backdrop';
-      if (!this.props.shouldAnimateIn) {
+      if (!shouldAnimateIn) {
         imageViewerBackdropClasses += ' show';
       }
 
-      var child = this.props.child;
       var title = '';
-      if (child) {
+      if (child && child.title) {
         title = (
           '<p class="title text-white text-align-center">' +
             child.title +

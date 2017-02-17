@@ -4,17 +4,28 @@ var ObjectUtil = require('../../utils/ObjectUtil');
 function Thumbnail() {
   return ObjectUtil.inherits({
     getView: function () {
-      if (!this.props.src) {
+      var props = this.props;
+      var className = props.className;
+      var index = props.index;
+      var src = props.src;
+      var title = props.title;
+
+      if (!src) {
         return '';
       }
       var classes = 'thumbnail';
-      if (this.props.className) {
-        classes += ' ' + this.props.className;
+      if (className) {
+        classes += ' ' + className;
       }
 
       var dataIndex = '';
-      if (this.props.index != null) {
-        dataIndex = 'data-index="' + this.props.index + '" '
+      if (index != null) {
+        dataIndex = 'data-index="' + index + '" '
+      }
+
+      var titleElm = '';
+      if (title) {
+        titleElm = '<p>' + title + '</p>';
       }
 
       return (
@@ -22,9 +33,10 @@ function Thumbnail() {
           '<div ' +
             'class="fill-image" ' +
             dataIndex +
-            'data-src="' + this.props.src + '" ' +
-            'style="background-image: url(' + this.props.src + ')">' +
+            'data-src="' + src + '" ' +
+            'style="background-image: url(' + src + ')">' +
           '</div>' +
+          titleElm +
         '</div>'
       );
     }

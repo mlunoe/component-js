@@ -4,12 +4,13 @@ var ObjectUtil = require('../../utils/ObjectUtil');
 function Image() {
   return ObjectUtil.inherits({
     getView: function () {
-      if (!this.props.src) {
+      var src = this.props.src;
+      if (!src) {
         return '';
       }
 
       return (
-        '<img src="' + this.props.src + '" />'
+        '<img src="' + src + '" />'
       );
     }
   }, Component);
