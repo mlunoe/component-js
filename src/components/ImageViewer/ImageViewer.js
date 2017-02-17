@@ -139,7 +139,7 @@ function ImageViewer() {
           titleElm.classList.add('hidden');
         }
         // Show loader
-        element.querySelector('.loader').classList.remove('hidden');
+        element.querySelector('.loader-wrapper').classList.remove('hidden');
       }
 
       // Handle close viewer
@@ -165,7 +165,7 @@ function ImageViewer() {
 
 
       var element = this.getElement();
-      element.querySelector('.loader').classList.add('hidden');
+      element.querySelector('.loader-wrapper').classList.add('hidden');
       var imageElm = element.querySelector('.display-image');
       imageElm.classList.remove('hidden');
       var titleElm = element.querySelector('.title');
@@ -186,7 +186,7 @@ function ImageViewer() {
         return;
       }
       var element = this.getElement();
-      element.querySelector('.loader').classList.add('hidden');
+      element.querySelector('.loader-wrapper').classList.add('hidden');
       var titleElm = element.querySelector('.title');
       if (titleElm) {
         titleElm.classList.add('hidden');
@@ -234,7 +234,13 @@ function ImageViewer() {
         '<div ' + dataClose + ' class="' + imageViewerBackdropClasses +'">' +
           '<div class="image-viewer">' +
             '<span data-close="true" class="close-button"></span>' +
-            '<div class="loader"><div></div><div></div><div></div></div>' +
+            '<div class="loader-wrapper">' +
+              '<div class="loader">' +
+                '<div></div>' +
+                '<div></div>' +
+                '<div></div>' +
+              '</div>' +
+            '</div>' +
             '<p class="error-message primary hidden"></p>' +
             '<div class="display-image hidden"></div>' +
             title +

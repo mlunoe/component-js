@@ -71,11 +71,10 @@ new MyComponent().render(container);
 ### Limitations
 - This application is built using only ES5, without Babel polyfill or any JavaScript framework or libraries
 - There is still some polish left to do there for it to be super appealing visually
-- Only a few essential parts of the app have supporting unit tests, like the Component, EventEmitter and ObjectUtil, but a lot of the visual parts needs tests
+- Only a few essential parts of the app have supporting unit tests, like the Component, , ImageGrid, EventEmitter and ObjectUtil, but a lot of the visual parts needs tests
 - Using JSONP, which is a hacky way of working around cross origin issues (it also has the problem of not being cancellable). This app should really have its own server to request content from
-- Missing to handle loading and errors for the image viewer, and thumbnail grid
-- If screen gets too wide compared to width (image ratio is 9/16), the image gets cut off at the bottom
-- Image that does not follow the 9/16 ratio gets cut off to fit the ratio, in order to make the elements look nice
+- Missing to handle errors in the image viewer, and thumbnail grid
+- Images that do not follow the 9/16 ratio get cut off in thumbnails to fit the ratio, in order to make the elements look nice
 - IE overflows the grid, because of scrollbar
 
 ### Features

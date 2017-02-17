@@ -25,7 +25,7 @@ function Thumbnail() {
 
       var titleElm = '';
       if (title) {
-        titleElm = '<p>' + title + '</p>';
+        titleElm = '<p class="title">' + title + '</p>';
       }
 
       return (

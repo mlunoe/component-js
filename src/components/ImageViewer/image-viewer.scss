@@ -21,7 +21,7 @@
   display: flex;
   flex: 0 1 auto;
   flex-direction: column;
-  flex-grow: 1;
+  flex-grow: 0;
   flex-shrink: 0;
   height: 70vh;
   width: 90vw;
@@ -37,7 +37,7 @@
   }
 
   .display-image {
-    overflow: hidden;
+    overflow: auto;
   }
 
   .display-image,
