@@ -49,10 +49,12 @@ function ImageViewer() {
       this.componentDidUpdate();
     },
 
-    componentDidUpdate: function () {
-      photoID = getPhotoID(this.props.child.link);
+    componentWillUpdate: function () {
       // Clean up listeners
-      this.getElement().removeEventListener('click', this.handleImageEvent);
+      var element = this.getElement();
+      if (element) {
+        element.removeEventListener('click', this.handleImageEvent, false);
+      }
       PhotoStore.removeListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
         this.renderImage
@@ -61,6 +63,11 @@ function ImageViewer() {
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR,
         this.renderError
       );
+    },
+
+    componentDidUpdate: function () {
+      photoID = getPhotoID(this.props.child.link);
+
       // Re-attach listeners
       this.getElement().addEventListener('click', this.handleImageEvent, false);
       PhotoStore.on(
@@ -79,8 +86,11 @@ function ImageViewer() {
     componentWillUnmount: function () {
       // Clean up listeners
       keyPressListenerAttached = false;
-      global.window.removeEventListener('keydown', this.handleImageEvent);
-      this.getElement().removeEventListener('click', this.handleImageEvent);
+      global.window.removeEventListener('keydown', this.handleImageEvent, true);
+      var element = this.getElement();
+      if (element) {
+        element.removeEventListener('click', this.handleImageEvent, false);
+      }
       PhotoStore.removeListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
         this.renderImage
@@ -93,8 +103,11 @@ function ImageViewer() {
 
     /* Event handlers */
     handleImageEvent: function (event) {
-
       var element = this.getElement();
+      if (!element) {
+        return;
+      }
+
       var keyCodes = KeyboardUtil.keyCodes;
       var keyCode = event.keyCode;
       var dataset = event.target.dataset;

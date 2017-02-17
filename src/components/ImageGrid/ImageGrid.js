@@ -37,7 +37,7 @@ function ImageGrid() {
       }
 
       // Clean up
-      element.removeEventListener('click', this.handleImageClick);
+      element.removeEventListener('click', this.handleImageClick, false);
     },
 
     /* Event handlers */
