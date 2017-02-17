@@ -76,9 +76,9 @@ function PhotoStore() {
         }
 
         data.sizes.size.forEach(function (photo, index) {
-          // First available size of eiter 'Medium' or the last available size
-          if (!largeImages[photoID] && (photo.label.indexOf('Medium') > -1 ||
-            (index + 1 === data.sizes.length))) {
+          // First available size of eiter 'Original' or the last available size
+          if (!largeImages[photoID] && (photo.label.indexOf('Original') > -1 ||
+            (index + 1 === data.sizes.size.length))) {
             largeImages[photoID] = {src: photo.source};
           }
         });
