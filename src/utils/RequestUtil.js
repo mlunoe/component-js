@@ -9,7 +9,7 @@ var RequestUtil = {
    */
   jsonp: function (url, callbackName, callback) {
     var script = document.createElement('script');
-    script.setAttribute('src', url + '&callback=' + callbackName);
+    script.setAttribute('src', url + '&jsoncallback=' + callbackName);
     // Clean up after script
     script.onload = function () {
       document.body.removeChild(script);

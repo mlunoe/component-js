@@ -64,7 +64,7 @@ function PhotoStore() {
         '&api_key=5aa9a623bff2414e17acc8a5a4b894be' +
         '&photo_id=' + photoID +
         '&format=json';
-      RequestUtil.jsonp(url, 'jsonFlickrApi', function (data) {
+      RequestUtil.jsonp(url, 'jsonFlickrApi' + Date.now(), function (data) {
         if (data.stat !== 'ok') {
           this.emit(
             EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR,
@@ -76,9 +76,9 @@ function PhotoStore() {
         }
 
         data.sizes.size.forEach(function (photo, index) {
-          // Get medium size or t
-          if (photo.label === 'Medium' ||
-            (largeImages[photoID] && index + 1 === data.sizes.length)) {
+          // First available size of eiter 'Medium' or the last available size
+          if (!largeImages[photoID] && (photo.label.indexOf('Medium') > -1 ||
+            (index + 1 === data.sizes.length))) {
             largeImages[photoID] = {src: photo.source};
           }
         });
