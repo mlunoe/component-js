@@ -48,13 +48,25 @@ function Component() {
     },
     /**
      * Function to call when component should render into parent node
+     * Calls componentWillMount when node will be mounted
      * Calls componentDidMount when node has mounted
+     * Calls componentWillUpdate when node will be updated
      * Calls componentDidUpdate when node was updated
      * @param  {DOM Node} parentElement to render component within
      * @param  {Object} properties passed from render caller
      */
     render: function (parentElement, props) {
       this.props = props || {};
+
+      // Call will mount
+      if (!element && typeof this.componentWillMount === 'function') {
+        this.componentWillMount();
+      }
+
+      // Call will update
+      if (element && typeof this.componentWillUpdate === 'function') {
+        this.componentWillUpdate();
+      }
 
       // Create temporary node to set innerHTML in
       var tempNode = document.createElement('div');

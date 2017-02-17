@@ -6,22 +6,24 @@ function SearchBar() {
   return ObjectUtil.inherits({
     /* Lifecycle methods */
     componentDidMount: function () {
+      var props = this.props;
       // Default to 100 miliseconds. A good time for responsive behaviour
-      var wait = this.props.wait || 100;
+      var wait = props.wait || 100;
       // Call onChange on input change
       this.getElement().addEventListener(
         'input',
         // Debounce requests on input, so we only request when typing stops
-        FunctionUtil.debounce(this.props.onChange, 100)
+        FunctionUtil.debounce(props.onChange, 100)
       );
     },
 
     /* View functions */
     getView: function () {
-      if (typeof this.props.onChange !== 'function') {
+      var onChange = this.props.onChange;
+      if (typeof onChange !== 'function') {
         throw new Error(
           'SearchBar needs onChange as a function. Type "' +
-          typeof this.props.onChange +
+          typeof onChange +
           '" was given.'
         );
       }
