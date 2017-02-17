@@ -12,7 +12,9 @@ describe('Component', function () {
 
   beforeEach(function () {
     component = ObjectUtil.inherits({
+      componentWillMount: sinon.spy(),
       componentDidMount: sinon.spy(),
+      componentWillUpdate: sinon.spy(),
       componentDidUpdate: sinon.spy(),
       componentWillUnmount: sinon.spy(),
       getView: function () {
@@ -73,6 +75,10 @@ describe('Component', function () {
       expect(div.appendChild.called).to.equal(false);
     });
 
+    it('calls componentWillMount if implemented', function () {
+      expect(component.componentWillMount.calledOnce).to.equal(true);
+    });
+
     it('calls componentDidMount if implemented', function () {
       expect(component.componentDidMount.calledOnce).to.equal(true);
     });
@@ -89,6 +95,11 @@ describe('Component', function () {
       component.render(div, {one: 'one', two: 'two', three: 'three'});
       expect(component.props)
         .to.deep.equal({one: 'one', two: 'two', three: 'three'});
+    });
+
+    it('calls componentWillUpdate if implemented', function () {
+      component.render(div);
+      expect(component.componentDidUpdate.calledOnce).to.equal(true);
     });
 
     it('calls componentDidUpdate if implemented', function () {
