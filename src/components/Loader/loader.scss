@@ -15,6 +15,14 @@
   }
 }
 
+.loader-wrapper {
+  align-items: center;
+  display: flex;
+  height: 300px;
+  justify-content: center;
+  width: 300px;
+}
+
 .loader {
   position: relative;
   transform: translateY(-25px);

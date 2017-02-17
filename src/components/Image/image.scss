@@ -1,10 +1,7 @@
-.fill-image {
-  background-position: center;
-  background-size: cover;
-
-  &:before {
-    content: '';
-    display: block;
-    padding-bottom: 100% * 9/16;
+.display-image {
+  img {
+    max-height: 70vh;
+    max-width: 90vw;
+    overflow: auto;
   }
 }
