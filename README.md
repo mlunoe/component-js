@@ -1,14 +1,14 @@
 component.js
 ===
 
-A minimal modular application structure (boilerplate) in plain JavaScript (ES5) for creating reusable components. The application is a small Image Viewer used as an example for testing the abilities and limitations of the main [Component.js](https://github.com/mlunoe/component-js/blob/master/app/components/Component/Component.js) and structure.
+A minimal modular application structure (boilerplate) in plain JavaScript (ES5) for creating reusable components. The application is a small Image Viewer used as an example for testing the abilities and limitations of the main [Component.js](https://github.com/mlunoe/component-js/blob/master/src/components/Component/Component.js) and structure.
 
-See [Component.js](https://github.com/mlunoe/component-js/blob/master/app/components/Component/Component.js) and an example usage here: [SearchBar.js](https://github.com/mlunoe/component-js/blob/master/app/components/SearchBar/SearchBar.js).
+See [Component.js](https://github.com/mlunoe/component-js/blob/master/src/components/Component/Component.js) and an example usage here: [SearchBar.js](https://github.com/mlunoe/component-js/blob/master/src/components/SearchBar/SearchBar.js).
 
 ### Usage
 
-Built with node v4.4.4 and npm v3.9.1.
-Tested on Chrome v50.0.2661,  Firefox v46.0.1, Safari v9.1.1 and IE11
+Built with node v7.5.x and npm v4.1.x.
+Tested on Chrome v56.0.2924.87, Firefox v49.0.1, Safari v10.0.2 and IE11
 
 ```
 npm install && npm start
@@ -19,7 +19,7 @@ See it running here [http://mlunoe.github.io/component-js](http://mlunoe.github.
 
 <img src="https://raw.githubusercontent.com/mlunoe/component-js/235dae2388bcdb90b101a595b165690e7c3f22c4/screenshots/image-viewer.png" width="50%" />
 
-Example usage of [Component.js](https://github.com/mlunoe/component-js/blob/master/app/components/Component/Component.js):
+Example usage of [Component.js](https://github.com/mlunoe/component-js/blob/master/src/components/Component/Component.js):
 ```js
 var Component = require('../Component/Component');
 var ObjectUtil = require('./utils/ObjectUtil');
@@ -28,12 +28,20 @@ module.exports = function MyComponent() {
   // Private scope
 
   return ObjectUtil.inherits({
-    componentDidMount(element) {
-      // Do something with element after mount
+    componentWillMount() {
+      // Do something before mount
+    },
+
+    componentDidMount() {
+      // Do something with this.getElement() after mount
+    },
+
+    componentWillUpdate() {
+      // Do something before update
     },
 
     componentDidUpdate() {
-      // Do something on component update
+      // Do something with this.getElement() on component update
     },
 
     componentWillUnmount() {
@@ -58,7 +66,7 @@ new MyComponent().render(container);
 
 ### Focus:
 - The focus of this application is on building out a modular application structure with self-contained components
-- The main building blocks of the app is the [Component.js](https://github.com/mlunoe/component-js/blob/master/app/components/Component/Component.js), [EventEmitter.js](https://github.com/mlunoe/component-js/blob/master/app/events/EventEmitter.js) and [ObjectUtil.js](https://github.com/mlunoe/component-js/blob/master/app/utils/ObjectUtil.js).
+- The main building blocks of the app is the [Component.js](https://github.com/mlunoe/component-js/blob/master/src/components/Component/Component.js), [EventEmitter.js](https://github.com/mlunoe/component-js/blob/master/src/events/EventEmitter.js) and [ObjectUtil.js](https://github.com/mlunoe/component-js/blob/master/src/utils/ObjectUtil.js).
 
 ### Limitations
 - This application is built using only ES5, without Babel polyfill or any JavaScript framework or libraries

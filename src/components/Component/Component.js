@@ -8,12 +8,20 @@
  *   // Private scope
  *
  *   return ObjectUtil.inherits({
+ *     componentWillMount() {
+ *       // Do something before mount
+ *     },
+ *
  *     componentDidMount() {
  *       // Do something with this.getElement() after mount
  *     },
  *
+ *     componentWillUpdate() {
+ *       // Do something before update
+ *     },
+ *
  *     componentDidUpdate() {
- *       // Do something  with this.getElement() on component update
+ *       // Do something with this.getElement() on component update
  *     },
  *
  *     componentWillUnmount() {
