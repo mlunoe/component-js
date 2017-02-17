@@ -17,7 +17,7 @@ open http://localhost:8080
 
 See it running here [http://mlunoe.github.io/component-js](http://mlunoe.github.io/component-js)
 
-<img src="https://raw.githubusercontent.com/mlunoe/component-js/a44b8ac993f9929049336f21b0de7510eeb8b5d3/screenshots/image-viewer.png" width="50%" />
+<img src="https://raw.githubusercontent.com/mlunoe/component-js/5b542c095ea3c70484f39da09a0724553f7f0603/screenshots/image-viewer.png" width="50%" />
 
 Example usage of [Component.js](https://github.com/mlunoe/component-js/blob/master/src/components/Component/Component.js):
 ```js
