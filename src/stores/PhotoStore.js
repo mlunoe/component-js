@@ -82,6 +82,17 @@ function PhotoStore() {
             largeImages[photoID] = {src: photo.source};
           }
         });
+
+        if (!largeImages[photoID]) {
+          this.emit(
+            EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR,
+            photoID,
+            'Did not find any content when searching for requested image.'
+          );
+
+          return false;
+        }
+
         this.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, photoID);
       }.bind(this));
     },

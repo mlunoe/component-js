@@ -134,10 +134,6 @@ function ImageViewer() {
         // Hide error message and display image
         element.querySelector('.error-message').classList.remove('hidden');
         element.querySelector('.display-image').classList.add('hidden');
-        var titleElm = element.querySelector('.title');
-        if (titleElm) {
-          titleElm.classList.add('hidden');
-        }
         // Show loader
         element.querySelector('.loader-wrapper').classList.remove('hidden');
       }
@@ -168,10 +164,6 @@ function ImageViewer() {
       element.querySelector('.loader-wrapper').classList.add('hidden');
       var imageElm = element.querySelector('.display-image');
       imageElm.classList.remove('hidden');
-      var titleElm = element.querySelector('.title');
-      if (titleElm) {
-        titleElm.classList.remove('hidden');
-      }
 
       image.render(imageElm, {
         src: photo.src,
@@ -187,10 +179,6 @@ function ImageViewer() {
       }
       var element = this.getElement();
       element.querySelector('.loader-wrapper').classList.add('hidden');
-      var titleElm = element.querySelector('.title');
-      if (titleElm) {
-        titleElm.classList.add('hidden');
-      }
       var errorElement = element.querySelector('.error-message');
       errorElement.classList.remove('hidden');
       errorElement.innerHTML = message || 'Image request error';
