@@ -32,7 +32,7 @@ describe('Component', function () {
   describe('#render()', function () {
 
     it('renders correctly', function () {
-      var elements = div.getElementsByClassName('component');
+      var elements = div.querySelectorAll('.component');
       expect(elements[0].innerHTML).to.equal('My Component');
     });
 
@@ -119,7 +119,7 @@ describe('Component', function () {
 
     it('removes child correctly', function () {
       component.unmount();
-      var elements = div.getElementsByClassName('component');
+      var elements = div.querySelectorAll('.component');
       expect(elements.length).to.equal(0);
     });
 
