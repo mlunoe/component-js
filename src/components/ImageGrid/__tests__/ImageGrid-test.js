@@ -56,16 +56,16 @@ describe('ImageGrid', function () {
   describe('#render()', function () {
 
     it('renders the grid element', function () {
-      var elements = div.getElementsByClassName('grid');
-      expect(elements[0].className).to.equal('grid grid--1of4');
+      var imageGridEl = div.querySelector('.grid');
+      expect(imageGridEl.className).to.equal('grid grid--1of4');
     });
 
     it('renders images inside the grid element', function () {
       // Test number of items
-      var gridItems = div.getElementsByClassName('grid-item');
+      var gridItems = div.querySelectorAll('.grid-item');
       expect(gridItems.length).to.equal(3);
       // Test content
-      var images = div.getElementsByClassName('fill-image');
+      var images = div.querySelectorAll('.fill-image');
       expect(images[0].getAttribute('data-src')).to.equal('foo');
       expect(images[1].getAttribute('data-src')).to.equal('bar');
     });
@@ -75,8 +75,11 @@ describe('ImageGrid', function () {
         return [];
       };
       imageGrid.render(div);
-      var elements = div.getElementsByClassName('text-align-center primary');
-      expect(elements[0].innerHTML).to.equal('Sorry, no images was found from that search. Please try another search.');
+      var element = div.querySelector('.text-align-center.primary');
+      expect(element.innerHTML).to.equal(
+        'Sorry, no images was found from that search. ' +
+        'Please try another search.'
+      );
     });
 
   });
@@ -85,35 +88,60 @@ describe('ImageGrid', function () {
 
     it('should show selected image', function () {
       // Trigger image click
-      imageGrid.handleImageClick({target: {dataset: {index: 0}}});
-      var imageViewer = div.getElementsByClassName('image-viewer')[0];
-      expect(typeof imageViewer).to.not.equal('undefined');
+      var firstGridItem = div.querySelector('.grid-item');
+      imageGrid.handleImageClick({target: firstGridItem});
+      var imageViewer = div.querySelector('.image-viewer');
+      expect(imageViewer).to.not.equal(null);
 
       // Emit store event to fetch selected image
       PhotoStore.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, 'foo');
-      var selectedImage = imageViewer.getElementsByTagName('img')[0];
+      var selectedImage = imageViewer.querySelector('img');
       expect(selectedImage.getAttribute('src')).to.equal('/foo-large');
+    });
+
+    it('should show selected image from click on children', function () {
+      // Trigger image click
+      var firstFillImage = div.querySelector('.fill-image');
+      imageGrid.handleImageClick({target: firstFillImage});
+      var imageViewer = div.querySelector('.image-viewer');
+      expect(imageViewer).to.not.equal(null);
+
+      // Emit store event to fetch selected image
+      PhotoStore.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, 'foo');
+      var selectedImage = imageViewer.querySelector('img');
+      expect(selectedImage.getAttribute('src')).to.equal('/foo-large');
+    });
+
+    it('stop iterating when hitting image grid', function () {
+      // Trigger image click
+      var imageGridElm = div.querySelector('.grid');
+      imageGrid.handleImageClick({target: imageGridElm});
+      var imageViewer = div.querySelector('.image-viewer');
+      expect(imageViewer).to.equal(null);
     });
 
     it('should show other selected image after re-opening', function () {
       // Trigger image click
-      imageGrid.handleImageClick({target: {dataset: {index: 0}}});
+      var secondGridItem = div.querySelector('.grid-item');
+      imageGrid.handleImageClick({target: secondGridItem});
 
       // Close image viewer
       imageGrid.handleImageViewerClose();
 
       // Trigger another image click
-      imageGrid.handleImageClick({target: {dataset: {index: 2}}});
+      var thirdGridItem = div.querySelectorAll('.grid-item')[2];
+      imageGrid.handleImageClick({target: thirdGridItem});
       // Emit store event to fetch new selected image
       PhotoStore.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, 'baz');
 
-      var selectedImage = div.getElementsByTagName('img')[0];
+      var selectedImage = div.querySelector('img');
       expect(selectedImage.getAttribute('src')).to.equal('/baz-large');
     });
 
     it('should show error message', function () {
       // Trigger image click
-      imageGrid.handleImageClick({target: {dataset: {index: 0}}});
+      var firstGridItem = div.querySelector('.grid-item');
+      imageGrid.handleImageClick({target: firstGridItem});
 
       // Emit store event to display error message
       PhotoStore.emit(
@@ -121,7 +149,7 @@ describe('ImageGrid', function () {
         'foo',
         'Some error'
       );
-      var errorMessage = div.getElementsByClassName('error-message')[0];
+      var errorMessage = div.querySelector('.error-message');
       expect(errorMessage.innerHTML).to.equal('Some error');
     });
 
@@ -131,13 +159,14 @@ describe('ImageGrid', function () {
 
     it('should close the image viewer', function () {
       // Trigger image click
-      imageGrid.handleImageClick({target: {dataset: {index: 0}}});
+      var firstGridItem = div.querySelector('.grid-item');
+      imageGrid.handleImageClick({target: firstGridItem});
 
       // Emit store event to fetch selected image
       PhotoStore.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, 'foo');
       imageGrid.handleImageViewerClose();
-      var selectedImage = div.getElementsByTagName('img')[0];
-      expect(typeof selectedImage).to.equal('undefined');
+      var selectedImage = div.querySelector('img');
+      expect(selectedImage).to.equal(null);
     });
 
   });
@@ -147,32 +176,35 @@ describe('ImageGrid', function () {
 
     it('decrements selected image index', function () {
       // Trigger image click
-      imageGrid.handleImageClick({target: {dataset: {index: 1}}});
+      var secondGridItem = div.querySelectorAll('.grid-item')[1];
+      imageGrid.handleImageClick({target: secondGridItem});
       // Trigger left click
       imageGrid.handleImageViewerLeftClick({}); // foo
       // Emit store event to fetch selected image
       PhotoStore.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, 'foo');
 
-      var selectedImage = div.getElementsByTagName('img')[0];
+      var selectedImage = div.querySelector('img');
       expect(selectedImage.getAttribute('src')).to.equal('/foo-large');
     });
 
     it('overflows the index to point to end when < 0', function () {
       // Trigger image click
-      imageGrid.handleImageClick({target: {dataset: {index: 1}}});
+      var secondGridItem = div.querySelectorAll('.grid-item')[1];
+      imageGrid.handleImageClick({target: secondGridItem});
       // Trigger left click
       imageGrid.handleImageViewerLeftClick({}); // foo
       imageGrid.handleImageViewerLeftClick({}); // baz
       // Emit store event to fetch selected image
       PhotoStore.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, 'baz');
 
-      var selectedImage = div.getElementsByTagName('img')[0];
+      var selectedImage = div.querySelector('img');
       expect(selectedImage.getAttribute('src')).to.equal('/baz-large');
     });
 
     it('overflows the index even for multiple rounds', function () {
       // Trigger image click
-      imageGrid.handleImageClick({target: {dataset: {index: 1}}});
+      var secondGridItem = div.querySelectorAll('.grid-item')[1];
+      imageGrid.handleImageClick({target: secondGridItem});
       // Trigger left click
       imageGrid.handleImageViewerLeftClick({}); // foo
       imageGrid.handleImageViewerLeftClick({}); // baz
@@ -182,7 +214,7 @@ describe('ImageGrid', function () {
       // Emit store event to fetch selected image
       PhotoStore.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, 'baz');
 
-      var selectedImage = div.getElementsByTagName('img')[0];
+      var selectedImage = div.querySelector('img');
       expect(selectedImage.getAttribute('src')).to.equal('/baz-large');
     });
 
@@ -192,32 +224,35 @@ describe('ImageGrid', function () {
 
     it('increments selected image index', function () {
       // Trigger image click
-      imageGrid.handleImageClick({target: {dataset: {index: 1}}});
+      var secondGridItem = div.querySelectorAll('.grid-item')[1];
+      imageGrid.handleImageClick({target: secondGridItem});
       // Trigger left click
       imageGrid.handleImageViewerRightClick({}); // baz
       // Emit store event to fetch selected image
       PhotoStore.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, 'baz');
 
-      var selectedImage = div.getElementsByTagName('img')[0];
+      var selectedImage = div.querySelector('img');
       expect(selectedImage.getAttribute('src')).to.equal('/baz-large');
     });
 
     it('overflows the index to point to start when > # of photos', function () {
       // Trigger image click
-      imageGrid.handleImageClick({target: {dataset: {index: 1}}});
+      var secondGridItem = div.querySelectorAll('.grid-item')[1];
+      imageGrid.handleImageClick({target: secondGridItem});
       // Trigger left click
       imageGrid.handleImageViewerRightClick({}); // baz
       imageGrid.handleImageViewerRightClick({}); // foo
       // Emit store event to fetch selected image
       PhotoStore.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, 'foo');
 
-      var selectedImage = div.getElementsByTagName('img')[0];
+      var selectedImage = div.querySelector('img');
       expect(selectedImage.getAttribute('src')).to.equal('/foo-large');
     });
 
     it('overflows the index even for multiple rounds', function () {
       // Trigger image click
-      imageGrid.handleImageClick({target: {dataset: {index: 1}}});
+      var secondGridItem = div.querySelectorAll('.grid-item')[1];
+      imageGrid.handleImageClick({target: secondGridItem});
       // Trigger left click
       imageGrid.handleImageViewerRightClick({}); // baz
       imageGrid.handleImageViewerRightClick({}); // foo
@@ -227,7 +262,7 @@ describe('ImageGrid', function () {
       // Emit store event to fetch selected image
       PhotoStore.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, 'foo');
 
-      var selectedImage = div.getElementsByTagName('img')[0];
+      var selectedImage = div.querySelector('img');
       expect(selectedImage.getAttribute('src')).to.equal('/foo-large');
     });
   });

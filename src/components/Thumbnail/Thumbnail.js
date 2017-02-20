@@ -29,10 +29,9 @@ function Thumbnail() {
       }
 
       return (
-        '<div class="' + classes + '">' +
+        '<div class="' + classes + '"' + dataIndex + '>' +
           '<div ' +
             'class="fill-image" ' +
-            dataIndex +
             'data-src="' + src + '" ' +
             'style="background-image: url(' + src + ')">' +
           '</div>' +
