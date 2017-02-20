@@ -95,6 +95,27 @@ describe('ImageGrid', function () {
       expect(selectedImage.getAttribute('src')).to.equal('/foo-large');
     });
 
+    it('should show selected image from click on children', function () {
+      // Trigger image click
+      var firstFillImage = div.querySelector('.fill-image');
+      imageGrid.handleImageClick({target: firstFillImage});
+      var imageViewer = div.querySelector('.image-viewer');
+      expect(imageViewer).to.not.equal(null);
+
+      // Emit store event to fetch selected image
+      PhotoStore.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, 'foo');
+      var selectedImage = imageViewer.querySelector('img');
+      expect(selectedImage.getAttribute('src')).to.equal('/foo-large');
+    });
+
+    it('stop iterating when hitting image grid', function () {
+      // Trigger image click
+      var imageGridElm = div.querySelector('.grid');
+      imageGrid.handleImageClick({target: imageGridElm});
+      var imageViewer = div.querySelector('.image-viewer');
+      expect(imageViewer).to.equal(null);
+    });
+
     it('should show other selected image after re-opening', function () {
       // Trigger image click
       imageGrid.handleImageClick({target: {dataset: {index: 0}}});

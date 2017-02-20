@@ -26,23 +26,34 @@ function ImageGrid() {
     },
 
     componentDidUpdate: function () {
-      this.getElement().addEventListener('click', this.handleImageClick, false);
+      var imageGrid = this.getElement().querySelector('.grid');
+      // Attach click listener to grid, to only listen for clicks within
+      // its children, and not, e.g. image viewer
+      imageGrid.addEventListener('click', this.handleImageClick, false);
       this.renderPhotoGrid();
     },
 
     componentWillUnmount: function () {
-      var element = this.getElement();
-      if (!element) {
+      var imageGrid = this.getElement().querySelector('.grid');
+      if (!imageGrid) {
         return;
       }
 
       // Clean up
-      element.removeEventListener('click', this.handleImageClick, false);
+      imageGrid.removeEventListener('click', this.handleImageClick, false);
     },
 
     /* Event handlers */
     handleImageClick: function (event) {
-      var index = parseInt(event.target.dataset.index, 10);
+      var node = event.target;
+      var imageGridElm = this.getElement().querySelector('.grid');
+      // Walk up dom tree to first element from event.target with `data-index`,
+      // stop if we reach the image grid node
+      while (node.getAttribute('data-index') == null && node !== imageGridElm) {
+        node = node.parentNode;
+      }
+
+      var index = parseInt(node.getAttribute('data-index'), 10);
       if (!isNaN(index)) {
         shouldAnimateIn = true;
         selectedImage = index;
