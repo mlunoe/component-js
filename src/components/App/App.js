@@ -1,22 +1,22 @@
-var Component = require('../Component');
+var Component = require('../Component/Component');
 var EventTypes = require('../../constants/EventTypes');
 var FunctionUtil = require('../../utils/FunctionUtil');
-var SearchBar = require('../SearchBar');
-var ImageGrid = require('../ImageGrid');
+var SearchBar = require('../SearchBar/SearchBar');
+var ImageGrid = require('../ImageGrid/ImageGrid');
 var ObjectUtil = require('../../utils/ObjectUtil');
 var PhotoStore = require('../../stores/PhotoStore');
-var Thumbnail = require('../Thumbnail');
+var Thumbnail = require('../Thumbnail/Thumbnail');
 
 function App() {
   var imageGrid = new ImageGrid();
   var searchBar = new SearchBar();
   var lastQuery = '';
 
-  return ObjectUtil.assign(Object.create(new Component()), {
+  return ObjectUtil.inherits({
     /* Lifecycle methods */
-    componentDidMount: function (element, props) {
+    componentDidMount: function () {
       // Fetch new photos on input change
-      searchBar.render(element.querySelector('.search-bar'), {
+      searchBar.render(this.getElement().querySelector('.search-bar'), {
         onChange: function () {
           // Don't re-fetch unless we have a new query
           if (lastQuery !== this.value) {
@@ -26,16 +26,13 @@ function App() {
         }
       });
 
-      // Pass necessary properties to handlers
-      this.renderImageGrid = this.renderImageGrid.bind(
-        this,
-        element.querySelector('.image-grid')
-      );
+      // Ensure context is this in handlers
+      this.renderImageGrid = this.renderImageGrid.bind(this);
+
+      // Re-render image grid when requested
+      imageGrid.on(EventTypes.COMPONENT_CHANGE, this.renderImageGrid);
       // Re-render image grid when new photos are received
-      PhotoStore.addListener(
-        EventTypes.PHOTO_STORE_PHOTOS_CHANGE,
-        this.renderImageGrid
-      );
+      PhotoStore.on(EventTypes.PHOTO_STORE_PHOTOS_CHANGE, this.renderImageGrid);
       // Fetch photos on intial render
       PhotoStore.fetchPhotos(lastQuery);
     },
@@ -54,8 +51,8 @@ function App() {
     },
 
     /* View functions */
-    renderImageGrid: function (imageGridEl) {
-      imageGrid.render(imageGridEl);
+    renderImageGrid: function () {
+      imageGrid.render(this.getElement().querySelector('.image-grid'));
     },
 
     getView: function () {
@@ -66,7 +63,7 @@ function App() {
         '</div>'
       );
     }
-  });
+  }, Component);
 }
 
 module.exports = App;

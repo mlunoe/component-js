@@ -1,41 +1,29 @@
-var Component = require('../../components/Component');
+var Component = require('../../components/Component/Component');
 var FunctionUtil = require('../../utils/FunctionUtil');
 var ObjectUtil = require('../../utils/ObjectUtil');
 
 function SearchBar() {
-  var onChange;
-
-  return ObjectUtil.assign(Object.create(new Component()), {
+  return ObjectUtil.inherits({
     /* Lifecycle methods */
     componentDidMount: function () {
-      this.componentDidUpdate.apply(this, arguments);
-    },
-
-    componentDidUpdate: function (element) {
-      // Clean up element listeners
-      element.removeEventListener('input', onChange, false);
-    },
-
-    componentDidUpdate: function (element, props) {
+      var props = this.props;
       // Default to 100 miliseconds. A good time for responsive behaviour
       var wait = props.wait || 100;
-      // Debounce requests on input, so we only request when typing stops
-      onChange = FunctionUtil.debounce(props.onChange, 100);
-      // Set element listers on input change
-      element.addEventListener('input', onChange, false);
-    },
-
-    componentWillUnmount: function (element) {
-      // Clean up element listeners
-      element.removeEventListener('input', onChange, false);
+      // Call onChange on input change
+      this.getElement().addEventListener(
+        'input',
+        // Debounce requests on input, so we only request when typing stops
+        FunctionUtil.debounce(props.onChange, 100)
+      );
     },
 
     /* View functions */
-    getView: function (props) {
-      if (typeof props.onChange !== 'function') {
+    getView: function () {
+      var onChange = this.props.onChange;
+      if (typeof onChange !== 'function') {
         throw new Error(
           'SearchBar needs onChange as a function. Type "' +
-          typeof props.onChange +
+          typeof onChange +
           '" was given.'
         );
       }
@@ -44,7 +32,7 @@ function SearchBar() {
         '<input placeholder="search" autofocus="true" class="search" />'
       );
     }
-  });
+  }, Component);
 }
 
 module.exports = SearchBar;

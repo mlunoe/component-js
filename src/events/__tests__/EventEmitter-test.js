@@ -17,13 +17,13 @@ describe('EventEmitter', function () {
   describe('#emit()', function () {
 
     it('should invoke the callback', function () {
-      emitter.addListener('foo', spy);
+      emitter.on('foo', spy);
       emitter.emit('foo');
       expect(spy.calledOnce).to.equal(true);
     })
 
     it('should pass arguments to the callbacks', function () {
-      emitter.addListener('foo', spy);
+      emitter.on('foo', spy);
       emitter.emit('foo', 'bar', 'baz');
       expect(spy.calledOnce).to.equal(true);
       expect(spy.getCall(0).args[0]).to.equal('bar');

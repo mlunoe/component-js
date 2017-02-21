@@ -1,9 +1,10 @@
-var Component = require('../Component');
+var Component = require('../Component/Component');
 var ObjectUtil = require('../../utils/ObjectUtil');
 
 function Thumbnail() {
-  return ObjectUtil.assign(Object.create(new Component()), {
-    getView: function (props) {
+  return ObjectUtil.inherits({
+    getView: function () {
+      var props = this.props;
       var className = props.className;
       var index = props.index;
       var src = props.src;
@@ -38,7 +39,7 @@ function Thumbnail() {
         '</div>'
       );
     }
-  });
+  }, Component);
 }
 
 module.exports = Thumbnail;

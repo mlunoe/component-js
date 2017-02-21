@@ -25,6 +25,31 @@ var ObjectUtil = {
     }
 
     return target;
+  },
+
+  /**
+   * Creates a new object with properties from Child and
+   * adds Parent as the prototype object.
+   * @param  {{Object|Function}} Child properties to have on
+   * newly created object
+   * @param  {{Object|Function}} Parent prototype to have on
+   * newly created object
+   * @return {Object} the object with Child properties
+   * and Parent protoype.
+   */
+  inherits: function (Child, Parent) {
+    var parent = Parent;
+    var child = Child;
+
+    if (typeof Parent === 'function') {
+      parent = new Parent();
+    }
+
+    if (typeof Child === 'function') {
+      child = new Child();
+    }
+
+    return this.assign(Object.create(parent), child);
   }
 };
 
