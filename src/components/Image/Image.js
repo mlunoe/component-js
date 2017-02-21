@@ -1,10 +1,10 @@
-var Component = require('../Component/Component');
+var Component = require('../Component');
 var ObjectUtil = require('../../utils/ObjectUtil');
 
 function Image() {
-  return ObjectUtil.inherits({
-    getView: function () {
-      var src = this.props.src;
+  return ObjectUtil.assign(Object.create(new Component()), {
+    getView: function (props) {
+      var src = props.src;
       if (!src) {
         return '';
       }
@@ -13,7 +13,7 @@ function Image() {
         '<img src="' + src + '" />'
       );
     }
-  }, Component);
+  });
 }
 
 module.exports = Image;

@@ -21,7 +21,7 @@ function PhotoStore() {
   var images = [];
   var largeImages = {};
 
-  return ObjectUtil.inherits({
+  return ObjectUtil.assign(Object.create(new EventEmitter()), {
     fetchPhotos: function (queryString) {
       var query = '';
       if (queryString) {
