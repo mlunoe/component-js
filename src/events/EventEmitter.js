@@ -1,19 +1,18 @@
 /*
  * Example usage:
  *
- * var EventEmitter require('../EventEmitter/EventEmitter');
+ * var EventEmitter require('../events/EventEmitter');
  * var ObjectUtil = require('./utils/ObjectUtil');
  *
  * module.exports = function MyEventEmitter() {
  *   // Private scope
  *
- *   return ObjectUtil.inhreits({
- *
+ *   return ObjectUtil.assign(Object.create(new EventEmitter()), {
  *     componentDidMount(element) {
  *       // Do something with element after mount
  *       this.emt('change', 'Element mounted');
  *     }
- *   }, EventEmitter);
+ *   });
  * };
  */
 
@@ -36,7 +35,7 @@ function EventEmitter() {
      * Subscribe to change fired by implementing component
      * @param  {Function} hander handler that is called on change
      */
-    on: function (eventName, handler) {
+    addListener: function (eventName, handler) {
       if (!eventName) {
         throw new Error('Subscribers must provide an event to listen to.');
       }
