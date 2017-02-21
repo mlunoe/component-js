@@ -1,34 +1,34 @@
 /*
  * Example usage:
  *
- * var Component = require('../Component');
+ * var Component = require('../Component/Component');
  * var ObjectUtil = require('./utils/ObjectUtil');
  *
  * module.exports = function MyComponent() {
  *   // Private scope
  *
- *   return ObjectUtil.assign(Object.create(new Component()), {
- *     componentWillMount(props) {
- *       // Do something with props before mount
+ *   return ObjectUtil.inherits({
+ *     componentWillMount() {
+ *       // Do something with this.props before mount
  *     },
  *
- *     componentDidMount(element, props) {
- *       // Do something with element and props after mount
+ *     componentDidMount() {
+ *       // Do something with this.props and this.getElement() after mount
  *     },
  *
- *     componentWillUpdate(element, props) {
- *       // Do something with element and props before update
+ *     componentWillUpdate() {
+ *       // Do something with this.props before update
  *     },
  *
- *     componentDidUpdate(element, props) {
- *       // Do something with element and props on update
+ *     componentDidUpdate() {
+ *       // Do something with this.props and this.getElement() on update
  *     },
  *
- *     componentWillUnmount(element, props) {
- *       // Clean up component with element and props
+ *     componentWillUnmount() {
+ *       // Clean up component
  *     },
  *
- *     getView(props) {
+ *     getView(parentElement) {
  *       // Return string of component view
  *       return (
  *         '<div>' +
@@ -36,57 +36,60 @@
  *         '</div>'
  *       );
  *     }
- *   });
+ *   }, Component);
  * };
  */
 
 function Component() {
   // Private scope
-  var element = null;
+  var element;
 
   return {
     // Public API
+    props: {},
+    /**
+     * Returns current attached element
+     * @return {DOMElement} current attached DOMElement for component
+     */
+    getElement: function () {
+      return element;
+    },
     /**
      * Function to call when component should render into parent node
      * Calls componentWillMount when node will be mounted
      * Calls componentDidMount when node has mounted
      * Calls componentWillUpdate when node will be updated
      * Calls componentDidUpdate when node was updated
-     * @param {DOM Node} parentElement to render component within
-     * @param {Object} properties passed from render caller
+     * @param  {DOM Node} parentElement to render component within
+     * @param  {Object} properties passed from render caller
      */
     render: function (parentElement, props) {
-      // Separate if-statement so Webpack knows to remove in production
-      if (process.env.NODE_ENV !== 'production') {
-        if (!parentElement) {
-          throw new Error('Parent of type: `' + typeof parentElement + '` is not valid. Please call `render` with a valid `HTMLElement`.');
-        }
-      }
+      this.props = props || {};
 
       // Call will mount
-      if (element == null && typeof this.componentWillMount === 'function') {
-        this.componentWillMount(props);
+      if (!element && typeof this.componentWillMount === 'function') {
+        this.componentWillMount();
       }
 
       // Call will update
-      if (element != null && typeof this.componentWillUpdate === 'function') {
-        this.componentWillUpdate(element, props);
+      if (element && typeof this.componentWillUpdate === 'function') {
+        this.componentWillUpdate();
       }
 
       // Create temporary node to set innerHTML in
       var tempNode = document.createElement('div');
-      tempNode.innerHTML = this.getView(props);
+      tempNode.innerHTML = this.getView();
       // Get the first child of temporary node, i.e. our view and
       // store our new instance, and this before we get the view
       var newElement = tempNode.firstChild;
 
       // Rendering into new parent, unmount this element, so we can create a new
-      if (element != null && parentElement !== element.parentNode) {
-        this.unmount(element, props);
+      if (element && parentElement !== element.parentNode) {
+        this.unmount();
       }
       // Make sure that element is actually a child node of parent
       // before we attempt to replace
-      if (element != null && parentElement === element.parentNode) {
+      if (element && parentElement === element.parentNode) {
         // Handle consecutive renders
         /*
          * Replace this line with:
@@ -97,7 +100,7 @@ function Component() {
         parentElement.replaceChild(newElement, element);
       }
 
-      if (element == null) {
+      if (!element) {
         // Handle first render
         parentElement.appendChild(newElement);
       }
@@ -106,13 +109,13 @@ function Component() {
       element = newElement;
 
       // Call did mount
-      if (oldElement == null && typeof this.componentDidMount === 'function') {
-        this.componentDidMount(element, props);
+      if (!oldElement && typeof this.componentDidMount === 'function') {
+        this.componentDidMount();
       }
 
       // Call did update
-      if (oldElement != null && typeof this.componentDidUpdate === 'function') {
-        this.componentDidUpdate(element, props);
+      if (oldElement && typeof this.componentDidUpdate === 'function') {
+        this.componentDidUpdate();
       }
     },
 
@@ -120,14 +123,9 @@ function Component() {
      * Unmounts element from its parent, if it has a parent. Calls
      * componentWillUnmount if defined on object.
      */
-    unmount: function (props) {
-      // Component was already unmounted
-      if (element == null) {
-        return;
-      }
-
+    unmount: function () {
       if (typeof this.componentWillUnmount === 'function') {
-        this.componentWillUnmount(element, props);
+        this.componentWillUnmount();
       }
 
       // Check if child still has a parent node before attempting to remove
@@ -135,22 +133,8 @@ function Component() {
         element.parentNode.removeChild(element);
       }
 
-      // Reset reference
-      element = null;
-    },
-
-    /**
-     * Produces view declaration in the form of a string
-     * @param  {Object} props properties passed to Component in `render`
-     * @return {String} view declaration to render in DOM
-     */
-    getView: function (props) {
-      // Separate if-statement so Webpack knows to remove in production
-      if (process.env.NODE_ENV !== 'production') {
-        throw new Error(typeof this + ' does not implement `getView`, but extends from Component. All objects that extends Component must implement `getView`');
-      }
-
-      return '';
+      // Delete reference
+      element = undefined;
     }
   };
 }

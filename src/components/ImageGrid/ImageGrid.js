@@ -1,142 +1,135 @@
-var Component = require('../../components/Component');
+var Component = require('../../components/Component/Component');
 var EventEmitter = require('../../events/EventEmitter');
 var EventTypes = require('../../constants/EventTypes');
-var ImageViewer = require('../../components/ImageViewer');
+var ImageViewer = require('../../components/ImageViewer/ImageViewer');
 var ObjectUtil = require('../../utils/ObjectUtil');
 var PhotoStore = require('../../stores/PhotoStore');
-var Thumbnail = require('../../components/Thumbnail');
+var Thumbnail = require('../../components/Thumbnail/Thumbnail');
 
 function ImageGrid() {
   var imageViewer = new ImageViewer();
   var shouldAnimateIn = true;
-  var selectedImageIndex;
+  var selectedImage;
 
-  /* Event handlers */
-  function handleImageClick(imageGridElm, props, event) {
-    var node = event.target;
-    // Walk up dom tree to first element from event.target with `data-index`,
-    // stop if we reach the image grid node
-    while (node.getAttribute('data-index') == null && node !== imageGridElm) {
-      node = node.parentNode;
-    }
-    var index = parseInt(node.getAttribute('data-index'), 10);
-    if (!isNaN(index)) {
-      shouldAnimateIn = true;
-      selectedImageIndex = index;
-      renderSelectedImage(imageGridElm.nextSibling, props);
-    }
-  }
-
-  function handleImageViewerClose(selectedImageElm, props) {
-    shouldAnimateIn = true;
-    selectedImageIndex = undefined;
-    renderSelectedImage(selectedImageElm, props);
-  }
-
-  function handleImageViewerLeftClick(selectedImageElm, props, event) {
-    var photos = PhotoStore.getPhotos();
-    // Should do nothing if there are no photos
-    if (!photos) {
-      return;
-    }
-
-    if (--selectedImageIndex < 0) {
-      selectedImageIndex = photos.length - 1;
-    }
-
-    shouldAnimateIn = false;
-    renderSelectedImage(selectedImageElm, props);
-  }
-
-  function handleImageViewerRightClick(selectedImageElm, props, event) {
-    var photos = PhotoStore.getPhotos();
-    // Should do nothing if there are no photos
-    if (!photos) {
-      return;
-    }
-
-    // Add before the modulus operator and use modulus as a circular buffer
-    selectedImageIndex = ++selectedImageIndex % photos.length;
-    shouldAnimateIn = false;
-    renderSelectedImage(selectedImageElm, props);
-  }
-
-  /* View functions */
-  function renderPhotoGrid(imageGridElm, props) {
-    PhotoStore.getPhotos().forEach(function (props, index) {
-      var newProps = ObjectUtil.assign({}, props);
-      newProps.index = index;
-      newProps.className = 'grid-item';
-      new Thumbnail().render(imageGridElm, newProps);
-    });
-  }
-
-  function renderSelectedImage(selectedImageElm, props) {
-    var photos = PhotoStore.getPhotos();
-    if (!photos.length) {
-      return;
-    }
-
-    var selectedChild = photos[selectedImageIndex];
-    if (!selectedChild) {
-      imageViewer.unmount(props);
-
-      return;
-    }
-    imageViewer.render(selectedImageElm, {
-      backdropClose: true,
-      onLeftClick: this.handleImageViewerLeftClick,
-      onRightClick: this.handleImageViewerRightClick,
-      onClose: this.handleImageViewerClose,
-      child: selectedChild,
-      shouldAnimateIn: shouldAnimateIn
-    });
-  }
-
-  return ObjectUtil.assign(Object.create(new Component()), {
+  return ObjectUtil.inherits({
     /* Lifecycle methods */
     componentDidMount: function () {
-      this.componentDidUpdate.apply(this, arguments);
+      // Ensure context is this in handlers
+      this.handleImageClick = this.handleImageClick.bind(this);
+      this.handleImageViewerClose = this.handleImageViewerClose.bind(this);
+      this.handleImageViewerLeftClick =
+        this.handleImageViewerLeftClick.bind(this);
+      this.handleImageViewerRightClick =
+        this.handleImageViewerRightClick.bind(this);
+
+      this.componentDidUpdate();
     },
 
-    componentWillUpdate: function (element, props) {
-      // Clean up element listeners
-      var imageGridElm = element.querySelector('.grid');
-      imageGridElm.removeEventListener('click', this.handleImageClick, false);
+    componentDidUpdate: function () {
+      var imageGrid = this.getElement().querySelector('.grid');
+      // Attach click listener to grid, to only listen for clicks within
+      // its children, and not, e.g. image viewer
+      imageGrid.addEventListener('click', this.handleImageClick, false);
+      this.renderPhotoGrid();
     },
 
-    componentDidUpdate: function (element, props) {
-      var selectedImageElm = element.querySelector('.selected-image');
-      var imageGridElm = element.querySelector('.grid');
+    componentWillUnmount: function () {
+      var imageGrid = this.getElement().querySelector('.grid');
+      if (!imageGrid) {
+        return;
+      }
 
-      // Pass down necessary props to handler
-      this.handleImageClick = handleImageClick.bind(this, imageGridElm, props);
-      this.handleImageViewerLeftClick = handleImageViewerLeftClick.bind(
-        this,
-        selectedImageElm,
-        props
-      );
-      this.handleImageViewerRightClick = handleImageViewerRightClick.bind(
-        this,
-        selectedImageElm,
-        props
-      );
-      this.handleImageViewerClose = handleImageViewerClose.bind(
-        this,
-        selectedImageElm,
-        props
-      );
-
-      // Re-attach element click listener to grid, to only listen
-      // for clicks within its children, and not, e.g. image viewer
-      imageGridElm.addEventListener('click', this.handleImageClick, false);
-      renderPhotoGrid(imageGridElm, props);
+      // Clean up
+      imageGrid.removeEventListener('click', this.handleImageClick, false);
     },
 
-    componentWillUnmount: function (element) {
-      // Clean up element listeners
-      var imageGridElm = element.querySelector('.grid');
-      imageGridElm.removeEventListener('click', this.handleImageClick, false);
+    /* Event handlers */
+    handleImageClick: function (event) {
+      var node = event.target;
+      var imageGridElm = this.getElement().querySelector('.grid');
+      // Walk up dom tree to first element from event.target with `data-index`,
+      // stop if we reach the image grid node
+      while (node.getAttribute('data-index') == null && node !== imageGridElm) {
+        node = node.parentNode;
+      }
+
+      var index = parseInt(node.getAttribute('data-index'), 10);
+      if (!isNaN(index)) {
+        shouldAnimateIn = true;
+        selectedImage = index;
+        this.renderSelectedImage();
+      }
+    },
+
+    handleImageViewerClose: function () {
+      shouldAnimateIn = true;
+      selectedImage = undefined;
+      this.renderSelectedImage();
+    },
+
+    handleImageViewerLeftClick: function (event) {
+      var photos = PhotoStore.getPhotos();
+      // Should do nothing if the key event was already consumed,
+      // or there are no photos
+      if (event.defaultPrevented || !photos) {
+        return;
+      }
+
+      if (--selectedImage < 0) {
+        selectedImage = photos.length - 1;
+      }
+
+      shouldAnimateIn = false;
+      this.renderSelectedImage();
+    },
+
+    handleImageViewerRightClick: function (event) {
+      var photos = PhotoStore.getPhotos();
+      // Should do nothing if the key event was already consumed,
+      // or there are no photos
+      if (event.defaultPrevented || !photos) {
+        return;
+      }
+
+      // Add before the modulus operator and use modulus as a circular buffer
+      selectedImage = ++selectedImage % photos.length;
+      shouldAnimateIn = false;
+      this.renderSelectedImage();
+    },
+
+    /* View functions */
+    renderPhotoGrid: function () {
+      var element = this.getElement().querySelector('.grid');
+      PhotoStore.getPhotos().forEach(function (props, index) {
+        var newProps = ObjectUtil.assign({}, props);
+        newProps.index = index;
+        newProps.className = 'grid-item';
+        new Thumbnail().render(element, newProps);
+      });
+    },
+
+    renderSelectedImage: function () {
+      var photos = PhotoStore.getPhotos();
+      var element = this.getElement().querySelector('.selected-image');
+      if (!element || !photos.length) {
+        return;
+      }
+
+      var selectedChild = photos[selectedImage];
+      if (!selectedChild) {
+        imageViewer.unmount();
+
+        return;
+      }
+
+      imageViewer.render(element, {
+        backdropClose: true,
+        onLeftClick: this.handleImageViewerLeftClick,
+        onRightClick: this.handleImageViewerRightClick,
+        onClose: this.handleImageViewerClose,
+        child: selectedChild,
+        shouldAnimateIn: shouldAnimateIn
+      });
     },
 
     getView: function () {
@@ -158,7 +151,7 @@ function ImageGrid() {
         '</div>'
       );
     }
-  });
+  }, ObjectUtil.inherits(Component, EventEmitter));
 }
 
 module.exports = ImageGrid;
