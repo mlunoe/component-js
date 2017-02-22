@@ -27,28 +27,28 @@ var ObjectUtil = require('./utils/ObjectUtil');
 module.exports = function MyComponent() {
   // Private scope
 
-  return ObjectUtil.inherits({
-    componentWillMount() {
-      // Do something with this.props before mount
+  return ObjectUtil.assign(Object.create(new Component()), {
+    componentWillMount(props) {
+      // Do something with props before mount
     },
 
-    componentDidMount() {
-      // Do something with this.props and this.getElement() after mount
+    componentDidMount(element, props) {
+      // Do something with element and props after mount
     },
 
-    componentWillUpdate() {
-      // Do something with this.props before update
+    componentWillUpdate(element, props) {
+      // Do something with element and props before update
     },
 
-    componentDidUpdate() {
-      // Do something with this.props and this.getElement() on update
+    componentDidUpdate(element, props) {
+      // Do something with element and props on update
     },
 
-    componentWillUnmount() {
-      // Clean up component
+    componentWillUnmount(element, props) {
+      // Clean up component with element and props
     },
 
-    getView(parentElement) {
+    getView(props) {
       // Return string of component view
       return (
         '<div>' +
@@ -56,12 +56,12 @@ module.exports = function MyComponent() {
         '</div>'
       );
     }
-  }, Component);
+  });
 };
 
 // Mount component
 var container = document.createElement('div');
-new MyComponent().render(container);
+new MyComponent().render(container, {foo: 'bar'});
 ```
 
 ### Focus:
@@ -71,7 +71,7 @@ new MyComponent().render(container);
 ### Limitations
 - This application is built using only ES5, without Babel polyfill or any JavaScript framework or libraries
 - There is still some polish left to do there for it to be super appealing visually
-- Only a few essential parts of the app have supporting unit tests, like the Component, , ImageGrid, EventEmitter and ObjectUtil, but a lot of the visual parts needs tests
+- Only a few essential parts of the app have supporting unit tests, like the Component, ImageGrid, EventEmitter and ObjectUtil, but a lot of the visual parts needs tests
 - Using JSONP, which is a hacky way of working around cross origin issues (it also has the problem of not being cancellable). This app should really have its own server to request content from
 - Missing to handle errors in the image viewer, and thumbnail grid
 - Images that do not follow the 9/16 ratio get cut off in thumbnails to fit the ratio, in order to make the elements look nice
