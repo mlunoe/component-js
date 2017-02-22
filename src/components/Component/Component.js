@@ -120,14 +120,14 @@ function Component() {
      * Unmounts element from its parent, if it has a parent. Calls
      * componentWillUnmount if defined on object.
      */
-    unmount: function (props) {
+    unmount: function () {
       // Component was already unmounted
       if (element == null) {
         return;
       }
 
       if (typeof this.componentWillUnmount === 'function') {
-        this.componentWillUnmount(element, props);
+        this.componentWillUnmount(element);
       }
 
       // Check if child still has a parent node before attempting to remove
