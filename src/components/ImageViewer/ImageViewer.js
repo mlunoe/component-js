@@ -5,6 +5,8 @@ var PhotoStore = require('../../stores/PhotoStore');
 var KeyboardUtil = require('../../utils/KeyboardUtil');
 var ObjectUtil = require('../../utils/ObjectUtil');
 
+var keyCodes = KeyboardUtil.keyCodes;
+
 var getPhotoID = function (link) {
   var segments = link.split('/');
   var id = segments.pop()
@@ -21,45 +23,9 @@ function ImageViewer() {
   var imageProps;
 
   /* Event handlers */
-  function handleImageEvent(element, props, event) {
-    var keyCodes = KeyboardUtil.keyCodes;
-    var keyCode = event.keyCode;
-    var direction = event.target.getAttribute('data-direction');
-    var close = event.target.getAttribute('data-close');
-    var onLeftClick = props.onLeftClick;
-    var onRightClick = props.onRightClick;
-    var onClose = props.onClose;
-
-    // Handle change image left
-    if (typeof onLeftClick === 'function' && direction === 'left' ||
-      keyCode === keyCodes.leftArrow) {
-      onLeftClick(event);
-    }
-
-    // Handle change image right
-    if (typeof onRightClick === 'function' && direction === 'right' ||
-      keyCode === keyCodes.rightArrow) {
-      onRightClick(event);
-    }
-
-    if (direction === 'left' || keyCode === keyCodes.leftArrow ||
-      direction === 'right' || keyCode === keyCodes.rightArrow) {
-      // Hide error message and display image
-      element.querySelector('.error-message').classList.remove('hidden');
-      element.querySelector('.display-image').classList.add('hidden');
-      // Show loader
-      element.querySelector('.loader-wrapper').classList.remove('hidden');
-    }
-
-    // Handle close viewer
-    if (close === 'true' || keyCode === keyCodes.esc) {
-      // Remove class to animate. Call close when animation is done
-      element.classList.remove('show');
-      setTimeout(function () {
-        onClose(event);
-      }, 200);
-    }
-  }
+  var handleImageEvent = function () {};
+  var handleRenderImage = function () {};
+  var handleRenderError = function () {};
 
   /* View functions */
   function renderImage(element, props, id) {
@@ -100,28 +66,76 @@ function ImageViewer() {
     componentDidMount: function (element, props) {
       this.componentDidUpdate.apply(this, arguments);
       // Set global listeners
-      global.addEventListener('keydown', this.handleImageEvent, false);
+      global.addEventListener('keydown', handleImageEvent, false);
     },
 
     componentWillUpdate: function (element) {
       // Clean up element listeners
-      element.removeEventListener('click', this.handleImageEvent, false);
+      element.removeEventListener('click', handleImageEvent, false);
       PhotoStore.removeListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
-        this.renderImage
+        handleRenderImage
       );
       PhotoStore.removeListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR,
-        this.renderError
+        handleRenderError
       );
+
+      // Reset handler after event listener was removed
+      handleImageEvent = function () {};
+      handleRenderImage = function () {};
+      handleRenderError = function () {};
     },
 
     componentDidUpdate: function (element, props) {
       photoID = getPhotoID(props.child.link);
-      // Pass down necessary props
-      this.handleImageEvent = handleImageEvent.bind(this, element, props);
-      this.renderImage = renderImage.bind(this, element, props);
-      this.renderError = renderError.bind(this, element);
+
+      var onLeftClick = props.onLeftClick;
+      var onRightClick = props.onRightClick;
+      var onClose = props.onClose;
+
+      // Create new handlers for events
+      handleImageEvent = function (event) {
+        var keyCode = event.keyCode;
+        var direction = event.target.getAttribute('data-direction');
+        var close = event.target.getAttribute('data-close');
+
+        // Handle change image left
+        if (typeof onLeftClick === 'function' && direction === 'left' ||
+          keyCode === keyCodes.leftArrow) {
+          onLeftClick(event);
+        }
+
+        // Handle change image right
+        if (typeof onRightClick === 'function' && direction === 'right' ||
+          keyCode === keyCodes.rightArrow) {
+          onRightClick(event);
+        }
+
+        if (direction === 'left' || keyCode === keyCodes.leftArrow ||
+          direction === 'right' || keyCode === keyCodes.rightArrow) {
+          // Hide error message and display image
+          element.querySelector('.error-message').classList.remove('hidden');
+          element.querySelector('.display-image').classList.add('hidden');
+          // Show loader
+          element.querySelector('.loader-wrapper').classList.remove('hidden');
+        }
+
+        // Handle close viewer
+        if (close === 'true' || keyCode === keyCodes.esc) {
+          // Remove class to animate. Call close when animation is done
+          element.classList.remove('show');
+          setTimeout(function () {
+            onClose(event);
+          }, 200);
+        }
+      };
+      handleRenderImage = function (id) {
+        renderImage(element, props, id);
+      };
+      handleRenderError = function (id, message) {
+        renderError(element, id, message);
+      };
 
       // Add show class in next render cycle to animate in
       if (props.shouldAnimateIn) {
@@ -133,14 +147,14 @@ function ImageViewer() {
       }
 
       // Re-attach element listeners
-      element.addEventListener('click', this.handleImageEvent, false);
+      element.addEventListener('click', handleImageEvent, false);
       PhotoStore.addListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
-        this.renderImage
+        handleRenderImage
       );
       PhotoStore.addListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR,
-        this.renderError
+        handleRenderError
       );
 
       // Fetch large photo
@@ -149,17 +163,22 @@ function ImageViewer() {
 
     componentWillUnmount: function (element) {
       // Clean up global listeners
-      global.removeEventListener('keydown', this.handleImageEvent, false);
+      global.removeEventListener('keydown', handleImageEvent, false);
       // Clean up element listeners
-      element.removeEventListener('click', this.handleImageEvent, false);
+      element.removeEventListener('click', handleImageEvent, false);
       PhotoStore.removeListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
-        this.renderImage
+        handleRenderImage
       );
       PhotoStore.removeListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR,
-        this.renderError
+        handleRenderError
       );
+
+      // Reset handler after event listener was removed
+      handleImageEvent = function () {};
+      handleRenderImage = function () {};
+      handleRenderError = function () {};
     },
 
     getView: function (props) {

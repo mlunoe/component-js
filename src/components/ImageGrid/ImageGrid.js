@@ -12,28 +12,30 @@ function ImageGrid() {
   var selectedImageIndex;
 
   /* Event handlers */
-  function handleImageClick(imageGridElm, props, event) {
+  var handleRenderSelectedImage = function () {};
+
+  function handleImageClick(event) {
     var node = event.target;
     // Walk up dom tree to first element from event.target with `data-index`,
     // stop if we reach the image grid node
-    while (node.getAttribute('data-index') == null && node !== imageGridElm) {
+    while (node.getAttribute('data-index') == null && node !== this) {
       node = node.parentNode;
     }
     var index = parseInt(node.getAttribute('data-index'), 10);
     if (!isNaN(index)) {
       shouldAnimateIn = true;
       selectedImageIndex = index;
-      renderSelectedImage(imageGridElm.nextSibling, props);
+      handleRenderSelectedImage();
     }
   }
 
-  function handleImageViewerClose(selectedImageElm, props) {
+  function handleImageViewerClose() {
     shouldAnimateIn = true;
     selectedImageIndex = undefined;
-    renderSelectedImage(selectedImageElm, props);
+    handleRenderSelectedImage();
   }
 
-  function handleImageViewerLeftClick(selectedImageElm, props, event) {
+  function handleImageViewerLeftClick(event) {
     var photos = PhotoStore.getPhotos();
     // Should do nothing if there are no photos
     if (!photos) {
@@ -45,10 +47,10 @@ function ImageGrid() {
     }
 
     shouldAnimateIn = false;
-    renderSelectedImage(selectedImageElm, props);
+    handleRenderSelectedImage();
   }
 
-  function handleImageViewerRightClick(selectedImageElm, props, event) {
+  function handleImageViewerRightClick(event) {
     var photos = PhotoStore.getPhotos();
     // Should do nothing if there are no photos
     if (!photos) {
@@ -58,7 +60,7 @@ function ImageGrid() {
     // Add before the modulus operator and use modulus as a circular buffer
     selectedImageIndex = ++selectedImageIndex % photos.length;
     shouldAnimateIn = false;
-    renderSelectedImage(selectedImageElm, props);
+    handleRenderSelectedImage();
   }
 
   /* View functions */
@@ -71,7 +73,7 @@ function ImageGrid() {
     });
   }
 
-  function renderSelectedImage(selectedImageElm, props) {
+  function renderSelectedImage(selectedImageElm) {
     var photos = PhotoStore.getPhotos();
     if (!photos.length) {
       return;
@@ -79,15 +81,16 @@ function ImageGrid() {
 
     var selectedChild = photos[selectedImageIndex];
     if (!selectedChild) {
-      imageViewer.unmount(props);
+      imageViewer.unmount();
 
       return;
     }
+
     imageViewer.render(selectedImageElm, {
       backdropClose: true,
-      onLeftClick: this.handleImageViewerLeftClick,
-      onRightClick: this.handleImageViewerRightClick,
-      onClose: this.handleImageViewerClose,
+      onLeftClick: handleImageViewerLeftClick,
+      onRightClick: handleImageViewerRightClick,
+      onClose: handleImageViewerClose,
       child: selectedChild,
       shouldAnimateIn: shouldAnimateIn
     });
@@ -102,41 +105,32 @@ function ImageGrid() {
     componentWillUpdate: function (element, props) {
       // Clean up element listeners
       var imageGridElm = element.querySelector('.grid');
-      imageGridElm.removeEventListener('click', this.handleImageClick, false);
+      imageGridElm.removeEventListener('click', handleImageClick, false);
+      // Reset handler after event listener was removed
+      var handleRenderSelectedImage = function () {};
     },
 
     componentDidUpdate: function (element, props) {
       var selectedImageElm = element.querySelector('.selected-image');
       var imageGridElm = element.querySelector('.grid');
 
-      // Pass down necessary props to handler
-      this.handleImageClick = handleImageClick.bind(this, imageGridElm, props);
-      this.handleImageViewerLeftClick = handleImageViewerLeftClick.bind(
-        this,
-        selectedImageElm,
-        props
-      );
-      this.handleImageViewerRightClick = handleImageViewerRightClick.bind(
-        this,
-        selectedImageElm,
-        props
-      );
-      this.handleImageViewerClose = handleImageViewerClose.bind(
-        this,
-        selectedImageElm,
-        props
-      );
+      // Create new handler for when prop functions gets called
+      handleRenderSelectedImage = function () {
+        renderSelectedImage(selectedImageElm);
+      };
 
       // Re-attach element click listener to grid, to only listen
       // for clicks within its children, and not, e.g. image viewer
-      imageGridElm.addEventListener('click', this.handleImageClick, false);
+      imageGridElm.addEventListener('click', handleImageClick, false);
       renderPhotoGrid(imageGridElm, props);
     },
 
     componentWillUnmount: function (element) {
       // Clean up element listeners
       var imageGridElm = element.querySelector('.grid');
-      imageGridElm.removeEventListener('click', this.handleImageClick, false);
+      imageGridElm.removeEventListener('click', handleImageClick, false);
+      // Reset handler after event listener was removed
+      var handleRenderSelectedImage = function () {};
     },
 
     getView: function () {
