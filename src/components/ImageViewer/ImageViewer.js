@@ -24,41 +24,87 @@ function ImageViewer() {
 
   /* Event handlers */
   var handleImageEvent = function () {};
-  var handleRenderImage = function () {};
-  var handleRenderError = function () {};
+  function getImageEventHandler(element, props) {
+    var onLeftClick = props.onLeftClick;
+    var onRightClick = props.onRightClick;
+    var onClose = props.onClose;
 
-  /* View functions */
-  function renderImage(element, props, id) {
-    var child = props.child;
-    if (photoID !== id) {
-      return;
+    // Return handler for event
+    return function handleImageEvent(event) {
+      var keyCode = event.keyCode;
+      var direction = event.target.getAttribute('data-direction');
+      var close = event.target.getAttribute('data-close');
+
+      // Handle change image left
+      if (typeof onLeftClick === 'function' && direction === 'left' ||
+        keyCode === keyCodes.leftArrow) {
+        onLeftClick(event);
+      }
+
+      // Handle change image right
+      if (typeof onRightClick === 'function' && direction === 'right' ||
+        keyCode === keyCodes.rightArrow) {
+        onRightClick(event);
+      }
+
+      if (direction === 'left' || keyCode === keyCodes.leftArrow ||
+        direction === 'right' || keyCode === keyCodes.rightArrow) {
+        // Hide error message and display image
+        element.querySelector('.error-message').classList.remove('hidden');
+        element.querySelector('.display-image').classList.add('hidden');
+        // Show loader
+        element.querySelector('.loader-wrapper').classList.remove('hidden');
+      }
+
+      // Handle close viewer
+      if (close === 'true' || keyCode === keyCodes.esc) {
+        // Remove class to animate. Call close when animation is done
+        element.classList.remove('show');
+        setTimeout(function () {
+          onClose(event);
+        }, 200);
+      }
     }
-    var photo = PhotoStore.getLargePhoto(photoID);
-    if (!photo || !photo.src) {
-      return;
-    }
-
-    element.querySelector('.loader-wrapper').classList.add('hidden');
-    var imageElm = element.querySelector('.display-image');
-    imageElm.classList.remove('hidden');
-
-    image.render(imageElm, {
-      src: photo.src,
-      // Transfer other information
-      title: child.title,
-      link: child.link
-    });
   }
 
-  function renderError(element, id, message) {
-    if (photoID !== id) {
-      return;
-    }
+  /* View functions */
+  var renderImage = function () {};
+  function getImageRenderer(element, props) {
+    return function renderImage(id) {
+      var child = props.child;
+      if (photoID !== id) {
+        return;
+      }
+      var photo = PhotoStore.getLargePhoto(photoID);
+      if (!photo || !photo.src) {
+        return;
+      }
 
-    element.querySelector('.loader-wrapper').classList.add('hidden');
-    var errorElement = element.querySelector('.error-message');
-    errorElement.classList.remove('hidden');
-    errorElement.innerHTML = message || 'Image request error';
+      element.querySelector('.loader-wrapper').classList.add('hidden');
+      var imageElm = element.querySelector('.display-image');
+      imageElm.classList.remove('hidden');
+
+      image.render(imageElm, {
+        src: photo.src,
+        // Transfer other information
+        title: child.title,
+        link: child.link
+      });
+    };
+  }
+
+  var renderError = function () {};
+  function getErrorRenderer(element) {
+    return function renderError(id, message) {
+      if (photoID !== id) {
+        return;
+      }
+
+      element.querySelector('.loader-wrapper').classList.add('hidden');
+      var errorElement = element.querySelector('.error-message');
+      errorElement.classList.remove('hidden');
+      errorElement.innerHTML = message || 'Image request error';
+    };
   }
 
   return ObjectUtil.assign(Object.create(new Component()), {
@@ -74,17 +120,18 @@ function ImageViewer() {
       element.removeEventListener('click', handleImageEvent, false);
       PhotoStore.removeListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
-        handleRenderImage
+        renderImage
       );
       PhotoStore.removeListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR,
-        handleRenderError
+        renderError
       );
 
       // Reset handler after event listener was removed
       handleImageEvent = function () {};
-      handleRenderImage = function () {};
-      handleRenderError = function () {};
+      // Reset renderers after event listener was removed
+      renderImage = function () {};
+      renderError = function () {};
     },
 
     componentDidUpdate: function (element, props) {
@@ -94,48 +141,11 @@ function ImageViewer() {
       var onRightClick = props.onRightClick;
       var onClose = props.onClose;
 
-      // Create new handlers for events
-      handleImageEvent = function (event) {
-        var keyCode = event.keyCode;
-        var direction = event.target.getAttribute('data-direction');
-        var close = event.target.getAttribute('data-close');
-
-        // Handle change image left
-        if (typeof onLeftClick === 'function' && direction === 'left' ||
-          keyCode === keyCodes.leftArrow) {
-          onLeftClick(event);
-        }
-
-        // Handle change image right
-        if (typeof onRightClick === 'function' && direction === 'right' ||
-          keyCode === keyCodes.rightArrow) {
-          onRightClick(event);
-        }
-
-        if (direction === 'left' || keyCode === keyCodes.leftArrow ||
-          direction === 'right' || keyCode === keyCodes.rightArrow) {
-          // Hide error message and display image
-          element.querySelector('.error-message').classList.remove('hidden');
-          element.querySelector('.display-image').classList.add('hidden');
-          // Show loader
-          element.querySelector('.loader-wrapper').classList.remove('hidden');
-        }
-
-        // Handle close viewer
-        if (close === 'true' || keyCode === keyCodes.esc) {
-          // Remove class to animate. Call close when animation is done
-          element.classList.remove('show');
-          setTimeout(function () {
-            onClose(event);
-          }, 200);
-        }
-      };
-      handleRenderImage = function (id) {
-        renderImage(element, props, id);
-      };
-      handleRenderError = function (id, message) {
-        renderError(element, id, message);
-      };
+      // Create new handlers for event
+      handleImageEvent = getImageEventHandler(element, props);
+      // Create new render functions
+      renderImage = getImageRenderer(element, props);
+      renderError = getErrorRenderer(element);
 
       // Add show class in next render cycle to animate in
       if (props.shouldAnimateIn) {
@@ -150,11 +160,11 @@ function ImageViewer() {
       element.addEventListener('click', handleImageEvent, false);
       PhotoStore.addListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
-        handleRenderImage
+        renderImage
       );
       PhotoStore.addListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR,
-        handleRenderError
+        renderError
       );
 
       // Fetch large photo
@@ -168,17 +178,18 @@ function ImageViewer() {
       element.removeEventListener('click', handleImageEvent, false);
       PhotoStore.removeListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
-        handleRenderImage
+        renderImage
       );
       PhotoStore.removeListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR,
-        handleRenderError
+        renderError
       );
 
       // Reset handler after event listener was removed
       handleImageEvent = function () {};
-      handleRenderImage = function () {};
-      handleRenderError = function () {};
+      // Reset renderers after event listener was removed
+      renderImage = function () {};
+      renderError = function () {};
     },
 
     getView: function (props) {
