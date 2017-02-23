@@ -1,4 +1,5 @@
 var Component = require('../../components/Component');
+var ComponentUtil = require('../../utils/ComponentUtil');
 var EventEmitter = require('../../events/EventEmitter');
 var EventTypes = require('../../constants/EventTypes');
 var ImageViewer = require('../../components/ImageViewer');
@@ -65,12 +66,16 @@ function ImageGrid() {
 
   /* View functions */
   function renderPhotoGrid(imageGridElm, props) {
-    PhotoStore.getPhotos().forEach(function (props, index) {
-      var newProps = ObjectUtil.assign({}, props);
-      newProps.index = index;
-      newProps.className = 'grid-item';
-      new Thumbnail().render(imageGridElm, newProps);
+    var components = PhotoStore.getPhotos().map(function (props, index) {
+      return function renderThumbnail(element) {
+        new Thumbnail().render(element, ObjectUtil.assign({}, props, {
+          className: 'grid-item',
+          index: index
+        }));
+      };
     });
+
+    ComponentUtil.renderMultiple(components, imageGridElm)
   }
 
   function renderSelectedImage(selectedImageElm) {

@@ -66,7 +66,7 @@ new MyComponent().render(container, {foo: 'bar'});
 
 ### Focus:
 - The focus of this application is on building out a modular application structure with self-contained components
-- The main building blocks of the app is the [Component.js](https://github.com/mlunoe/component-js/blob/master/src/components/Component/Component.js), [EventEmitter.js](https://github.com/mlunoe/component-js/blob/master/src/events/EventEmitter.js) and [ObjectUtil.js](https://github.com/mlunoe/component-js/blob/master/src/utils/ObjectUtil.js).
+- The main building blocks of the app is the [Component.js](https://github.com/mlunoe/component-js/blob/master/src/components/Component/Component.js), [EventEmitter.js](https://github.com/mlunoe/component-js/blob/master/src/events/EventEmitter.js), [ObjectUtil.js](https://github.com/mlunoe/component-js/blob/master/src/utils/ObjectUtil.js) and [ComponentUtil.js](https://github.com/mlunoe/component-js/blob/master/src/utils/ComponentUtil.js).
 
 ### Limitations
 - This application is built using only ES5, without Babel polyfill or any JavaScript framework or libraries
