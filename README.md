@@ -60,7 +60,7 @@ module.exports = function MyComponent() {
 };
 
 // Mount component
-var container = document.createElement('div');
+var container = global.document.createElement('div');
 new MyComponent().render(container, {foo: 'bar'});
 ```
 

@@ -8,21 +8,21 @@ var RequestUtil = {
    * @param  {Function} callback to be called when request returns
    */
   jsonp: function (url, callbackName, callback) {
-    var script = document.createElement('script');
+    var script = global.document.createElement('script');
     script.setAttribute('src', url + '&jsoncallback=' + callbackName);
     // Clean up after script
     script.onload = function () {
-      document.body.removeChild(script);
+      global.document.body.removeChild(script);
     }
 
-    window[callbackName] = function (data) {
+    global[callbackName] = function (data) {
       onGoingRequests[callbackName]--;
       if (onGoingRequests[callbackName] === 0) {
         delete onGoingRequests[callbackName];
       }
       // Clean up after callback, if we are the last call waiting
       if (onGoingRequests === 0) {
-        delete window[callbackName];
+        delete global[callbackName];
       }
       callback(data);
     };
@@ -34,7 +34,7 @@ var RequestUtil = {
     }
 
     onGoingRequests[callbackName]++;
-    document.body.appendChild(script);
+    global.document.body.appendChild(script);
   }
 };
 

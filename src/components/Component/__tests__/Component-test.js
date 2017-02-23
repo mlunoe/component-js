@@ -21,7 +21,7 @@ describe('Component', function () {
         return '<div class="component">My Component</div>'
       }
     });
-    div = document.createElement('div')
+    div = global.document.createElement('div')
     component.render(div);
   });
 
@@ -46,7 +46,7 @@ describe('Component', function () {
     it('shouldn\'t call replaceChild when rendered to new parent', function () {
       component.render(div);
       div.replaceChild = sinon.spy();
-      component.render(document.createElement('div'));
+      component.render(global.document.createElement('div'));
       expect(div.replaceChild.called).to.equal(false);
     });
 
