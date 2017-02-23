@@ -29,7 +29,8 @@ function PhotoStore() {
       }
       var url = baseUrl + '/feeds/photos_public.gne?' +
         'format=json' +
-        '&safe_search=3' +
+        '&safe_search=1' + // turn on safe search
+        '&media=photos' +
         query;
       RequestUtil.jsonp(url, 'jsonFlickrFeed', function (photos) {
         images = photos.items.map(function (photo) {
