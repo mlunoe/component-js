@@ -16,7 +16,7 @@ describe('ImageGrid', function () {
 
   beforeEach(function () {
     imageGrid = new ImageGrid();
-    div = document.createElement('div');
+    div = global.document.createElement('div');
 
     PhotoStore.getPhotos = function () {
       return [

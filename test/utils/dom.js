@@ -1,21 +1,21 @@
 var jsdom = require('jsdom');
 
-// setup the simplest document possible
+// setup the simplest global.document possible
 var doc = jsdom.jsdom('<!doctype html><html><body></body></html>');
 
-// get the window object out of the document
+// get the window object out of the global.document
 var win = doc.defaultView;
 
-// set globals for mocha that make access to document and window feel
+// set globals for mocha that make access to global.document and window feel
 // natural in the test environment
 global.document = doc;
 global.window = win;
 
-//JSDOM doesn't support localStrage by default, so lets just fake it..
-if (!global.window.localStorage) {
-  global.window.localStorage = {
-    getItem() { return '{}'; },
-    setItem() {}
+// JSDOM doesn't support localStrage by default, so lets just fake it..
+if (!global.localStorage) {
+  global.localStorage = {
+    getItem: function () { return '{}'; },
+    setItem: function () {}
   };
 }
 

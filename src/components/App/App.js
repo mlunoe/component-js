@@ -12,6 +12,14 @@ function App() {
   var searchBar = new SearchBar();
   var lastQuery = '';
 
+  /* View functions */
+  var renderImageGrid = function () {};
+  function getImageGridRenderer(imageGridEl) {
+    return function renderImageGrid() {
+      imageGrid.render(imageGridEl);
+    };
+  }
+
   return ObjectUtil.assign(Object.create(new Component()), {
     /* Lifecycle methods */
     componentDidMount: function (element, props) {
@@ -27,35 +35,27 @@ function App() {
       });
 
       // Pass necessary properties to handlers
-      this.renderImageGrid = this.renderImageGrid.bind(
-        this,
+      renderImageGrid = getImageGridRenderer(
         element.querySelector('.image-grid')
       );
       // Re-render image grid when new photos are received
       PhotoStore.addListener(
         EventTypes.PHOTO_STORE_PHOTOS_CHANGE,
-        this.renderImageGrid
+        renderImageGrid
       );
       // Fetch photos on intial render
       PhotoStore.fetchPhotos(lastQuery);
     },
 
     componentWillUnmount: function () {
-      // Never actually called,
-      // but always good practise to clean up after our selves
-      imageGrid.removeChangeListener(
-        EventTypes.PHOTO_STORE_PHOTOS_CHANGE,
-        this.renderImageGrid
-      );
+      // Never actually called, but good practise to clean up after our selves
       PhotoStore.removeChangeListener(
         EventTypes.PHOTO_STORE_PHOTOS_CHANGE,
-        this.renderImageGrid
+        renderImageGrid
       );
-    },
 
-    /* View functions */
-    renderImageGrid: function (imageGridEl) {
-      imageGrid.render(imageGridEl);
+      // Reset renderer after event listener was removed
+      renderImageGrid = function () {};
     },
 
     getView: function () {

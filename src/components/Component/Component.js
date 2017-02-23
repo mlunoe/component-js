@@ -74,7 +74,7 @@ function Component() {
       }
 
       // Create temporary node to set innerHTML in
-      var tempNode = document.createElement('div');
+      var tempNode = global.document.createElement('div');
       tempNode.innerHTML = this.getView(props);
       // Get the first child of temporary node, i.e. our view and
       // store our new instance, and this before we get the view
