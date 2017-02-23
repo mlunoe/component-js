@@ -29,7 +29,8 @@ function PhotoStore() {
       }
       var url = baseUrl + '/feeds/photos_public.gne?' +
         'format=json' +
-        '&safe_search=3' +
+        '&safe_search=1' + // turn on safe search
+        '&media=photos' +
         query;
       RequestUtil.jsonp(url, 'jsonFlickrFeed', function (photos) {
         images = photos.items.map(function (photo) {
@@ -61,7 +62,7 @@ function PhotoStore() {
       }
 
       var url =  baseUrl + '/rest/?method=flickr.photos.getSizes' +
-        '&api_key=5aa9a623bff2414e17acc8a5a4b894be' +
+        '&api_key=1c00c6a8b785a5baf3fb98859ae3ed18' +
         '&photo_id=' + photoID +
         '&format=json';
       RequestUtil.jsonp(url, 'jsonFlickrApi' + Date.now(), function (data) {
