@@ -61,7 +61,7 @@ function PhotoStore() {
       }
 
       var url =  baseUrl + '/rest/?method=flickr.photos.getSizes' +
-        '&api_key=5aa9a623bff2414e17acc8a5a4b894be' +
+        '&api_key=1c00c6a8b785a5baf3fb98859ae3ed18' +
         '&photo_id=' + photoID +
         '&format=json';
       RequestUtil.jsonp(url, 'jsonFlickrApi' + Date.now(), function (data) {
