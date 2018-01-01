@@ -10,6 +10,7 @@ var win = doc.defaultView;
 // natural in the test environment
 global.document = doc;
 global.window = win;
+global.HTMLElement = win.HTMLElement;
 
 // JSDOM doesn't support localStrage by default, so lets just fake it..
 if (!global.localStorage) {

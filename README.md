@@ -21,12 +21,12 @@ See it running here [http://mlunoe.github.io/component-js](http://mlunoe.github.
 
 Example usage of [Component.js](https://github.com/mlunoe/component-js/blob/master/src/components/Component/Component.js):
 ```js
-var Component = require('../Component/Component');
+var Component = require('../Component');
+var createElement = require('../../utils/ComponentUtil').createElement;
 var ObjectUtil = require('./utils/ObjectUtil');
 
 module.exports = function MyComponent() {
   // Private scope
-
   return ObjectUtil.assign(Object.create(new Component()), {
     componentWillMount(props) {
       // Do something with props before mount
@@ -48,12 +48,12 @@ module.exports = function MyComponent() {
       // Clean up component with element and props
     },
 
-    getView(props) {
-      // Return string of component view
+    render(props) {
+      // Return element of component view
       return (
-        '<div>' +
-          'Example DIV' +
-        '</div>'
+        createElement('div', null, [
+          createElement('Example content')
+        ])
       );
     }
   });
@@ -61,7 +61,7 @@ module.exports = function MyComponent() {
 
 // Mount component
 var container = global.document.createElement('div');
-new MyComponent().render(container, {foo: 'bar'});
+new MyComponent().mount(container, {foo: 'bar'});
 ```
 
 ### Focus:

@@ -1,4 +1,5 @@
 var Component = require('../../components/Component');
+var createElement = require('../../utils/ComponentUtil').createElement;
 var FunctionUtil = require('../../utils/FunctionUtil');
 var ObjectUtil = require('../../utils/ObjectUtil');
 
@@ -31,7 +32,7 @@ function SearchBar() {
     },
 
     /* View functions */
-    getView: function (props) {
+    render: function (props) {
       if (typeof props.onChange !== 'function') {
         throw new Error(
           'SearchBar needs onChange as a function. Type "' +
@@ -41,7 +42,11 @@ function SearchBar() {
       }
 
       return (
-        '<input placeholder="search" autofocus="true" class="search" />'
+        createElement('input', {
+          placeholder: 'search',
+          autofocus: 'true',
+          class: 'search-bar'
+        })
       );
     }
   });

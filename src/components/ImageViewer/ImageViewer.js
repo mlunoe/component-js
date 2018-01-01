@@ -1,16 +1,15 @@
 var Component = require('../Component');
-var Image = require('../Image');
+var createElement = require('../../utils/ComponentUtil').createElement;
 var EventTypes = require('../../constants/EventTypes');
-var PhotoStore = require('../../stores/PhotoStore');
-var KeyboardUtil = require('../../utils/KeyboardUtil');
+var Image = require('../Image');
+var keyCodes = require('../../utils/KeyboardUtil').keyCodes;
 var ObjectUtil = require('../../utils/ObjectUtil');
-
-var keyCodes = KeyboardUtil.keyCodes;
+var PhotoStore = require('../../stores/PhotoStore');
 
 var getPhotoID = function (link) {
   var segments = link.split('/');
   var id = segments.pop()
-  while (!id) {
+  while (!id && segments.length) {
     id = segments.pop();
   }
 
@@ -20,133 +19,93 @@ var getPhotoID = function (link) {
 function ImageViewer() {
   var image = new Image();
   var photoID;
-  var imageProps;
 
-  /* Event handlers */
-  var handleImageEvent = function () {};
-  function getImageEventHandler(element, props) {
-    var onLeftClick = props.onLeftClick;
-    var onRightClick = props.onRightClick;
-    var onClose = props.onClose;
-
-    // Return handler for event
-    return function handleImageEvent(event) {
+  var imageViewer = ObjectUtil.assign(Object.create(new Component()), {
+    name: 'imageViewer',
+    /* Event handlers */
+    handleImageEvent: function (event) {
+      var props = imageViewer.props;
       var keyCode = event.keyCode;
       var direction = event.target.getAttribute('data-direction');
       var close = event.target.getAttribute('data-close');
 
       // Handle change image left
-      if (typeof onLeftClick === 'function' && direction === 'left' ||
+      if (typeof props.onLeftClick === 'function' && direction === 'left' ||
         keyCode === keyCodes.leftArrow) {
-        onLeftClick(event);
+        props.onLeftClick(event);
       }
 
       // Handle change image right
-      if (typeof onRightClick === 'function' && direction === 'right' ||
+      if (typeof props.onRightClick === 'function' && direction === 'right' ||
         keyCode === keyCodes.rightArrow) {
-        onRightClick(event);
+        props.onRightClick(event);
       }
 
       if (direction === 'left' || keyCode === keyCodes.leftArrow ||
         direction === 'right' || keyCode === keyCodes.rightArrow) {
-        // Hide error message and display image
-        element.querySelector('.error-message').classList.remove('hidden');
-        element.querySelector('.display-image').classList.add('hidden');
-        // Show loader
-        element.querySelector('.loader-wrapper').classList.remove('hidden');
+        // Hide error message and display image and show loader
+        photoID = null;
+        imageViewer.setState({errorMessage: null, photo: null})
       }
 
       // Handle close viewer
       if (close === 'true' || keyCode === keyCodes.esc) {
+        var element = this;
+        if (this === global) {
+          element = global.document.querySelector('.image-viewer-backdrop');
+        }
         // Remove class to animate. Call close when animation is done
-        element.classList.remove('show');
+        if (element) {
+          element.classList.remove('show')
+        }
+
         setTimeout(function () {
-          onClose(event);
+          props.onClose(event);
         }, 200);
       }
-    }
-  }
-
-  /* View functions */
-  var renderImage = function () {};
-  function getImageRenderer(element, props) {
-    return function renderImage(id) {
-      var child = props.child;
-      if (photoID !== id) {
-        return;
-      }
-      var photo = PhotoStore.getLargePhoto(photoID);
-      if (!photo || !photo.src) {
-        return;
-      }
-
-      element.querySelector('.loader-wrapper').classList.add('hidden');
-      var imageElm = element.querySelector('.display-image');
-      imageElm.classList.remove('hidden');
-
-      image.render(imageElm, {
-        src: photo.src,
-        // Transfer other information
-        title: child.title,
-        link: child.link
-      });
-    };
-  }
-
-  var renderError = function () {};
-  function getErrorRenderer(element) {
-    return function renderError(id, message) {
-      if (photoID !== id) {
-        return;
-      }
-
-      element.querySelector('.loader-wrapper').classList.add('hidden');
-      var errorElement = element.querySelector('.error-message');
-      errorElement.classList.remove('hidden');
-      errorElement.innerHTML = message || 'Image request error';
-    };
-  }
-
-  return ObjectUtil.assign(Object.create(new Component()), {
-    /* Lifecycle methods */
-    componentDidMount: function (element, props) {
-      this.componentDidUpdate.apply(this, arguments);
-      // Set global listeners
-      global.addEventListener('keydown', handleImageEvent, false);
     },
 
-    componentWillUpdate: function (element) {
-      // Clean up element listeners
-      element.removeEventListener('click', handleImageEvent, false);
-      PhotoStore.removeListener(
-        EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
-        renderImage
-      );
-      PhotoStore.removeListener(
-        EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR,
-        renderError
-      );
+    handleUpdatePhotoID: function (id) {
+      if (photoID !== id) {
+        return;
+      }
 
-      // Reset handler after event listener was removed
-      handleImageEvent = function () {};
-      // Reset renderers after event listener was removed
-      renderImage = function () {};
-      renderError = function () {};
+      imageViewer.setState({
+        photo: PhotoStore.getLargePhoto(id)
+      });
+    },
+
+    handleUpdateError: function (id, message) {
+      if (photoID !== id) {
+        return;
+      }
+
+      imageViewer.setState({errorMessage: message || 'Image request error'});
+    },
+
+    /* Lifecycle methods */
+    componentDidMount: function (element, props) {
+      // Set global listeners
+      global.addEventListener('keydown', this.handleImageEvent, false);
+      PhotoStore.addListener(
+        EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
+        this.handleUpdatePhotoID
+      );
+      PhotoStore.addListener(
+        EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR,
+        this.handleUpdateError
+      );
+      this.componentDidUpdate.apply(this, arguments);
+    },
+
+    componentWillUpdate: function (element, props) {
+      // Clean up element listeners
+      if (element) {
+        element.removeEventListener('click', this.handleImageEvent, false);
+      }
     },
 
     componentDidUpdate: function (element, props) {
-      photoID = getPhotoID(props.child.link);
-
-      var onLeftClick = props.onLeftClick;
-      var onRightClick = props.onRightClick;
-      var onClose = props.onClose;
-
-      // Create new handlers for event
-      handleImageEvent = getImageEventHandler(element, props);
-      // Create new render functions
-      renderImage = getImageRenderer(element, props);
-      renderError = getErrorRenderer(element);
-
       // Add show class in next render cycle to animate in
       if (props.shouldAnimateIn) {
         if (element) {
@@ -157,49 +116,53 @@ function ImageViewer() {
       }
 
       // Re-attach element listeners
-      element.addEventListener('click', handleImageEvent, false);
-      PhotoStore.addListener(
-        EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
-        renderImage
-      );
-      PhotoStore.addListener(
-        EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR,
-        renderError
-      );
+      if (element) {
+        element.addEventListener('click', this.handleImageEvent, false);
+      }
 
-      // Fetch large photo
-      PhotoStore.fetchLargePhoto(photoID);
+      var link = '';
+      if (props.child && props.child.link) {
+        link = props.child.link;
+      }
+      // Fetch and store large photo
+      var newPhotoID = getPhotoID(link);
+      if (photoID !== newPhotoID) {
+        photoID = newPhotoID;
+        PhotoStore.fetchLargePhoto(photoID);
+      }
     },
 
     componentWillUnmount: function (element) {
       // Clean up global listeners
-      global.removeEventListener('keydown', handleImageEvent, false);
+      global.removeEventListener('keydown', this.handleImageEvent, false);
       // Clean up element listeners
-      element.removeEventListener('click', handleImageEvent, false);
+      if (element) {
+        element.removeEventListener('click', this.handleImageEvent, false);
+      }
       PhotoStore.removeListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
-        renderImage
+        this.handleUpdatePhotoID
       );
       PhotoStore.removeListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_ERROR,
-        renderError
+        this.handleUpdateError
       );
-
-      // Reset handler after event listener was removed
-      handleImageEvent = function () {};
-      // Reset renderers after event listener was removed
-      renderImage = function () {};
-      renderError = function () {};
     },
 
-    getView: function (props) {
-      var backdropClose = props.backdropClose;
+    render: function (props) {
       var child = props.child;
+      var backdropClose = props.backdropClose;
       var shouldAnimateIn = props.shouldAnimateIn;
+      var errorMessage = this.state.errorMessage;
+      var photo = this.state.photo;
+
+      if (child == null) {
+        return null;
+      }
 
       var dataClose = '';
       if (backdropClose) {
-        dataClose = 'data-close="true"';
+        dataClose = 'true';
       }
 
       var imageViewerBackdropClasses = 'image-viewer-backdrop';
@@ -207,38 +170,61 @@ function ImageViewer() {
         imageViewerBackdropClasses += ' show';
       }
 
-      var title = '';
-      if (child && child.title) {
+      var displayImage = null;
+      if (photo && photo.src) {
+        displayImage = createElement(image, {
+          class: 'display-image',
+          src: photo.src,
+          // Transfer other information
+          title: child.title,
+          link: child.src
+        });
+      }
+
+      var errorMessageComp = null;
+      if (typeof errorMessage === 'string') {
+        errorMessageComp = createElement('p', {class: 'error-message primary'}, [
+          createElement(errorMessage)
+        ]);
+      }
+
+      var loaderWrapperClasses = 'loader-wrapper';
+      if ((photo && photo.src) || errorMessage) {
+        loaderWrapperClasses += ' hidden';
+      }
+
+      var title = null;
+      if (child.title) {
         title = (
-          '<p class="title text-white text-align-center">' +
-            child.title +
-          '<p/>'
+          createElement('p', {class: 'title text-white text-align-center'}, [
+            createElement(child.title)
+          ])
         );
       }
 
       return (
-        '<div ' + dataClose + ' class="' + imageViewerBackdropClasses +'">' +
-          '<div class="image-viewer">' +
-            '<span data-close="true" class="close-button"></span>' +
-            '<div class="loader-wrapper">' +
-              '<div class="loader">' +
-                '<div></div>' +
-                '<div></div>' +
-                '<div></div>' +
-              '</div>' +
-            '</div>' +
-            '<p class="error-message primary hidden"></p>' +
-            '<div class="display-image hidden"></div>' +
-            title +
-            '<div class="arrow-container">' +
-              '<span data-direction="left" class="arrow left"></span>' +
-              '<span data-direction="right" class="arrow right"></span>' +
-            '</div>' +
-          '</div>' +
-        '</div>'
+        createElement('div', {class: imageViewerBackdropClasses, dataClose: dataClose}, [
+          createElement('div', {class: 'image-viewer'}, [
+            createElement('span', {dataClose: 'true', class: 'close-button'}),
+            createElement('div', {class: loaderWrapperClasses}, [
+              createElement('div'),
+              createElement('div'),
+              createElement('div')
+            ]),
+            errorMessageComp,
+            displayImage,
+            title,
+            createElement('div', {class: 'arrow-container'}, [
+              createElement('span', {class: 'arrow left', dataDirection: 'left'}),
+              createElement('span', {class: 'arrow right', dataDirection: 'right'})
+            ])
+          ])
+        ])
       );
     }
   });
+
+  return imageViewer;
 }
 
 module.exports = ImageViewer;
