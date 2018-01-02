@@ -1,13 +1,13 @@
 /*
  * Example usage:
  *
+ * var assign = require('./utils/ObjectUtil').assign;
  * var EventEmitter require('../events/EventEmitter');
- * var ObjectUtil = require('./utils/ObjectUtil');
  *
  * module.exports = function MyEventEmitter() {
  *   // Private scope
  *
- *   return ObjectUtil.assign(Object.create(new EventEmitter()), {
+ *   return assign(Object.create(new EventEmitter()), {
  *     componentDidMount(element) {
  *       // Do something with element after mount
  *       this.emt('change', 'Element mounted');

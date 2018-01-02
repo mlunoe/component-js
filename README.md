@@ -21,13 +21,13 @@ See it running here [http://mlunoe.github.io/component-js](http://mlunoe.github.
 
 Example usage of [Component.js](https://github.com/mlunoe/component-js/blob/master/src/components/Component/Component.js):
 ```js
+var assign = require('./utils/ObjectUtil').assign;
 var Component = require('../Component');
-var createElement = require('../../utils/ComponentUtil').createElement;
-var ObjectUtil = require('./utils/ObjectUtil');
+var createElement = require('./utils/ComponentUtil').createElement;
 
 module.exports = function MyComponent() {
   // Private scope
-  return ObjectUtil.assign(Object.create(new Component()), {
+  return assign(Object.create(new Component()), {
     componentWillMount(props) {
       // Do something with props before mount
     },

@@ -1,9 +1,9 @@
+var assign = require('../../utils/ObjectUtil').assign;
 var Component = require('../Component');
 var createElement = require('../../utils/ComponentUtil').createElement;
 var EventTypes = require('../../constants/EventTypes');
 var Image = require('../Image');
 var keyCodes = require('../../utils/KeyboardUtil').keyCodes;
-var ObjectUtil = require('../../utils/ObjectUtil');
 var PhotoStore = require('../../stores/PhotoStore');
 
 var getPhotoID = function (link) {
@@ -20,7 +20,7 @@ function ImageViewer() {
   var image = new Image();
   var photoID;
 
-  var imageViewer = ObjectUtil.assign(Object.create(new Component()), {
+  var imageViewer = assign(Object.create(new Component()), {
     name: 'imageViewer',
     /* Event handlers */
     handleImageEvent: function (event) {

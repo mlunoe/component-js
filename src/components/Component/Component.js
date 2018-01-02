@@ -1,16 +1,15 @@
-var ObjectUtil = require('../../utils/ObjectUtil');
+var assign = require('../../utils/ObjectUtil').assign;
 
 /*
  * Example usage:
  *
+ * var assign = require('./utils/ObjectUtil').assign;
  * var Component = require('../Component');
- * var createElement = require('../../utils/ComponentUtil').createElement;
- * var ObjectUtil = require('./utils/ObjectUtil');
+ * var createElement = require('./utils/ComponentUtil').createElement;
  *
  * module.exports = function MyComponent() {
  *   // Private scope
- *
- *   return ObjectUtil.assign(Object.create(new Component()), {
+ *   return assign(Object.create(new Component()), {
  *     componentWillMount(props) {
  *       // Do something with props before mount
  *     },
@@ -54,7 +53,6 @@ function camelCaseToDash(str) {
 function Component() {
   // Private scope
   var element = null;
-  // var parentComponent = null;
   var parentElement = null;
 
   return {
@@ -182,7 +180,7 @@ function Component() {
     },
 
     setState: function (changes) {
-      var newState = ObjectUtil.assign({}, this.state, changes);
+      var newState = assign({}, this.state, changes);
       if (newState === this.state) {
         return;
       }
@@ -192,7 +190,7 @@ function Component() {
     },
 
     setProps: function (changes) {
-      var newProps = ObjectUtil.assign({}, this.props, changes);
+      var newProps = assign({}, this.props, changes);
       if (newProps === this.props) {
         return;
       }
