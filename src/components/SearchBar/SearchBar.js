@@ -12,7 +12,7 @@ function SearchBar() {
       this.componentDidUpdate.apply(this, arguments);
     },
 
-    componentDidUpdate: function (element) {
+    componentWillUpdate: function (element) {
       // Clean up element listeners
       element.removeEventListener('input', onChange, false);
     },
@@ -21,7 +21,7 @@ function SearchBar() {
       // Default to 100 miliseconds. A good time for responsive behaviour
       var wait = props.wait || 100;
       // Debounce requests on input, so we only request when typing stops
-      onChange = FunctionUtil.debounce(props.onChange, 100);
+      onChange = FunctionUtil.debounce(props.onChange, wait);
       // Set element listers on input change
       element.addEventListener('input', onChange, false);
     },
@@ -34,11 +34,9 @@ function SearchBar() {
     /* View functions */
     render: function (props) {
       if (typeof props.onChange !== 'function') {
-        throw new Error(
-          'SearchBar needs onChange as a function. Type "' +
+        throw new Error('SearchBar needs onChange as a function. Type "' +
           typeof props.onChange +
-          '" was given.'
-        );
+          '" was given.');
       }
 
       return (

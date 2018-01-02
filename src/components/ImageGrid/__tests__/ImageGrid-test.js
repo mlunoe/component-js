@@ -1,13 +1,15 @@
-'use strict';
+/* global describe */
+/* global it */
+/* global beforeEach */
+/* global afterEach */
 
-var expect = require('chai').expect;
-var sinon = require('sinon');
-var clock = sinon.useFakeTimers();
-
-var createElement = require('../../../utils/ComponentUtil').createElement;
 var EventTypes = require('../../../constants/EventTypes');
+var expect = require('chai').expect;
 var ImageGrid = require('../ImageGrid');
 var PhotoStore = require('../../../stores/PhotoStore');
+var sinon = require('sinon');
+
+var clock = sinon.useFakeTimers();
 
 describe('ImageGrid', function () {
   var div;
@@ -56,7 +58,6 @@ describe('ImageGrid', function () {
 
 
   describe('#render()', function () {
-
     it('renders the grid element', function () {
       var imageGridEl = div.querySelector('.grid');
       expect(imageGridEl.className).to.equal('grid grid--1of4');
@@ -77,18 +78,14 @@ describe('ImageGrid', function () {
         return [];
       };
       imageGrid.mount(div);
-      PhotoStore.emit(EventTypes.PHOTO_STORE_PHOTOS_CHANGE)
+      PhotoStore.emit(EventTypes.PHOTO_STORE_PHOTOS_CHANGE);
       var element = div.querySelector('.text-align-center.primary');
-      expect(element.innerHTML).to.equal(
-        'Sorry, no images was found from that search. ' +
-        'Please try another search.'
-      );
+      expect(element.innerHTML).to.equal('Sorry, no images was found from that search. ' +
+        'Please try another search.');
     });
-
   });
 
   describe('#renderSelectedImage()', function () {
-
     it('should show selected image', function () {
       // Trigger image click
       var firstGridItem = div.querySelector('.grid-item');
@@ -161,11 +158,9 @@ describe('ImageGrid', function () {
       var errorMessage = div.querySelector('.error-message');
       expect(errorMessage.innerHTML).to.equal('Some error');
     });
-
   });
 
   describe('#handleImageViewerClose()', function () {
-
     it('should close the image viewer', function () {
       // Trigger image click
       var firstGridItem = div.querySelector('.grid-item');
@@ -182,12 +177,10 @@ describe('ImageGrid', function () {
       var selectedImage = div.querySelector('img');
       expect(selectedImage).to.equal(null);
     });
-
   });
 
 
   describe('#handleImageViewerLeftClick()', function () {
-
     it('decrements selected image index', function () {
       // Trigger image click
       var secondGridItem = div.querySelectorAll('.grid-item')[1];
@@ -219,11 +212,9 @@ describe('ImageGrid', function () {
       var selectedImage = div.querySelector('img');
       expect(selectedImage.getAttribute('src')).to.equal('/baz-large');
     });
-
   });
 
   describe('#handleImageViewerRightClick()', function () {
-
     it('increments selected image index', function () {
       // Trigger image click
       var secondGridItem = div.querySelectorAll('.grid-item')[1];
@@ -255,7 +246,5 @@ describe('ImageGrid', function () {
       var selectedImage = div.querySelector('img');
       expect(selectedImage.getAttribute('src')).to.equal('/foo-large');
     });
-
   });
-
 });

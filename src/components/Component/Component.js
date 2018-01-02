@@ -93,7 +93,7 @@ function Component() {
         Object.keys(props).forEach(function (key) {
           var value = props[key];
           var attrName = camelCaseToDash(key);
-          if (typeof value !== undefined && (attrNames.includes(attrName) || attrName.startsWith('data-'))) {
+          if (typeof value !== 'undefined' && (attrNames.includes(attrName) || attrName.startsWith('data-'))) {
             newElement.setAttribute(attrName, value);
           }
         });
@@ -110,10 +110,13 @@ function Component() {
       var oldElement = element;
       element = newElement;
 
-      if (parentElement != null && element != null && !parentElement.contains(element) && parentElement.contains(oldElement)) {
-        parentElement.replaceChild(element, oldElement);
-      } else if (parentElement != null && element != null && !parentElement.contains(element) && !parentElement.contains(oldElement)) {
-        parentElement.appendChild(element);
+      if (parentElement != null && element != null) {
+        if (!parentElement.contains(element) && parentElement.contains(oldElement)) {
+          parentElement.replaceChild(element, oldElement);
+        }
+        if (!parentElement.contains(element) && !parentElement.contains(oldElement)) {
+          parentElement.appendChild(element);
+        }
       }
 
       // Call did mount
@@ -134,7 +137,7 @@ function Component() {
      */
     mount: function (_parentElement, props) {
       if (_parentElement == null) {
-        return
+        return;
       }
 
       if (element != null && element.parentNode !== _parentElement) {
@@ -180,7 +183,7 @@ function Component() {
 
     setState: function (changes) {
       var newState = ObjectUtil.assign({}, this.state, changes);
-      if (newState === this.state ) {
+      if (newState === this.state) {
         return;
       }
 
@@ -190,7 +193,7 @@ function Component() {
 
     setProps: function (changes) {
       var newProps = ObjectUtil.assign({}, this.props, changes);
-      if (newProps === this.props ) {
+      if (newProps === this.props) {
         return;
       }
 

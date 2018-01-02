@@ -1,6 +1,5 @@
 var Component = require('../../components/Component');
 var createElement = require('../../utils/ComponentUtil').createElement;
-var EventEmitter = require('../../events/EventEmitter');
 var EventTypes = require('../../constants/EventTypes');
 var ImageViewer = require('../../components/ImageViewer');
 var ObjectUtil = require('../../utils/ObjectUtil');
@@ -22,7 +21,7 @@ function ImageGrid() {
 
     /* Event handlers */
     handlePhotosUpdate: function () {
-      imageGrid.setState({photos: PhotoStore.getPhotos()});
+      imageGrid.setState({ photos: PhotoStore.getPhotos() });
     },
 
     handleImageClick: function (event) {
@@ -34,6 +33,7 @@ function ImageGrid() {
       }
 
       var index = parseInt(node.getAttribute('data-index'), 10);
+      // eslint-disable-next-line no-restricted-globals
       if (!isNaN(index)) {
         imageGrid.setState({
           selectedImageIndex: index,
@@ -49,7 +49,7 @@ function ImageGrid() {
       });
     },
 
-    handleImageViewerLeftClick: function (event) {
+    handleImageViewerLeftClick: function () {
       var photos = PhotoStore.getPhotos();
       var selectedImageIndex = imageGrid.state.selectedImageIndex;
       // Should do nothing if there are no photos
@@ -68,7 +68,7 @@ function ImageGrid() {
       });
     },
 
-    handleImageViewerRightClick: function (event) {
+    handleImageViewerRightClick: function () {
       var photos = PhotoStore.getPhotos();
       var selectedImageIndex = imageGrid.state.selectedImageIndex;
       // Should do nothing if there are no photos
@@ -97,7 +97,7 @@ function ImageGrid() {
       this.componentDidUpdate.apply(this, arguments);
     },
 
-    componentWillUpdate: function (element, props) {
+    componentWillUpdate: function (element) {
       // Clean up element listeners
       if (element) {
         var imageGridElm = element.querySelector('.grid');
@@ -107,7 +107,7 @@ function ImageGrid() {
       }
     },
 
-    componentDidUpdate: function (element, props) {
+    componentDidUpdate: function (element) {
       if (element) {
         var imageGridElm = element.querySelector('.grid');
         if (imageGridElm) {
@@ -136,7 +136,7 @@ function ImageGrid() {
       if (!photos.length) {
         noImagesMessage = createElement(
           'p',
-          {class: 'text-align-center primary'},
+          { class: 'text-align-center primary' },
           [createElement('Sorry, no images was found from that search. Please try another search.')]
         );
       }
@@ -149,9 +149,9 @@ function ImageGrid() {
       });
 
       return (
-        createElement('div', {class: 'image-grid'}, [
+        createElement('div', { class: 'image-grid' }, [
           noImagesMessage,
-          createElement('div', {class: 'grid grid--1of4'}, tumbnails),
+          createElement('div', { class: 'grid grid--1of4' }, tumbnails),
           createElement(imageViewer, {
             backdropClose: true,
             child: photos[this.state.selectedImageIndex],
@@ -166,7 +166,7 @@ function ImageGrid() {
     }
   });
 
-return imageGrid;
+  return imageGrid;
 }
 
 module.exports = ImageGrid;

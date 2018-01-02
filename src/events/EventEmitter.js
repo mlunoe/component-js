@@ -23,10 +23,10 @@ function EventEmitter() {
     /**
      * Function to call to notify subscribers of change
      */
-    emit: function (eventName) {// , ...arg
+    emit: function (eventName /* , ...arg */) {
       var args = Array.prototype.slice.call(arguments, 1);
       var subscribers = subscriptions[eventName] || [];
-      subscribers.forEach(function(handler) {
+      subscribers.forEach(function (handler) {
         handler.apply(this, args);
       });
     },
@@ -73,8 +73,7 @@ function EventEmitter() {
       subscriptions[eventName] = subscriptions[eventName]
         .filter(function (eventHander) {
           return eventHander !== handler;
-        }
-      );
+        });
     }
   };
 }

@@ -7,24 +7,24 @@ var ObjectUtil = {
    * @param  {Object} source(s) the object to copy from
    * @return {Object} the object with source properties copied to target.
    */
-  assign: function (target) { // , ...source
-    if (target == null) {
+  assign: function (target /* , ...source */) {
+    var result = target;
+    if (result == null) {
       throw new TypeError('Cannot convert undefined or null to object');
     }
 
-    target = Object(target);
+    result = Object(result);
     for (var index = 1; index < arguments.length; index++) {
       var source = arguments[index];
       if (source != null) {
-        for (var key in source) {
-          if (Object.prototype.hasOwnProperty.call(source, key)) {
-            target[key] = source[key];
-          }
-        }
+        // eslint-disable-next-line no-loop-func
+        Object.keys(source).forEach(function (key) {
+          result[key] = source[key];
+        });
       }
     }
 
-    return target;
+    return result;
   }
 };
 

@@ -1,9 +1,10 @@
-'use strict';
-
-var expect = require('chai').expect;
-var sinon = require('sinon');
+/* global describe */
+/* global it */
+/* global beforeEach */
 
 var EventEmitter = require('../EventEmitter');
+var expect = require('chai').expect;
+var sinon = require('sinon');
 
 describe('EventEmitter', function () {
   var spy;
@@ -15,12 +16,11 @@ describe('EventEmitter', function () {
   });
 
   describe('#emit()', function () {
-
     it('should invoke the callback', function () {
       emitter.addListener('foo', spy);
       emitter.emit('foo');
       expect(spy.calledOnce).to.equal(true);
-    })
+    });
 
     it('should pass arguments to the callbacks', function () {
       emitter.addListener('foo', spy);
@@ -29,7 +29,5 @@ describe('EventEmitter', function () {
       expect(spy.getCall(0).args[0]).to.equal('bar');
       expect(spy.getCall(0).args[1]).to.equal('baz');
     });
-
   });
-
 });

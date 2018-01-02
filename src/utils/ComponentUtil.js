@@ -9,12 +9,11 @@ function createBaseComponent(type) {
     render: function () {
       var tagName = type.toLowerCase();
       if (tagNames.includes(tagName)) {
-        return document.createElement(type);
-      } else {
-        return document.createTextNode(type);
+        return global.document.createElement(type);
       }
+      return global.document.createTextNode(type);
     }
-  })
+  });
 }
 
 var ComponentUtil = {
@@ -24,13 +23,14 @@ var ComponentUtil = {
    * @param {<HTMLElement>[]?} children nested components
    * @return {HTMLElement}      rendered component
    */
-  createElement: function (component, props, children) {
-    props || (props = {});
-    if (typeof component === 'string') {
-      component = createBaseComponent(component)
+  createElement: function (componentOrType, propsOrNull, children) {
+    var props = propsOrNull || {};
+    var component = componentOrType;
+    if (typeof componentOrType === 'string') {
+      component = createBaseComponent(componentOrType);
     }
     if (typeof children === 'object' && children.length) {
-      ObjectUtil.assign(props, {children: children});
+      ObjectUtil.assign(props, { children: children });
     }
     component.setProps(props);
     component.forceUpdate();

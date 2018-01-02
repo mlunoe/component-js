@@ -46,7 +46,7 @@ if (process.env.NODE_ENV === 'development') {
 
   // Prints more readable module names in the browser console
   // on hot module updates
-  plugins.push(new webpack.NamedModulesPlugin())
+  plugins.push(new webpack.NamedModulesPlugin());
 }
 
 /**
@@ -98,7 +98,7 @@ module.exports = {
       {
         test: /\.html$/,
         use: [{
-          loader:'file-loader',
+          loader: 'file-loader',
           options: {
             // Keep original name, don't obscure
             name: '[name].[ext]'
