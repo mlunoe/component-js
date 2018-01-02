@@ -1,7 +1,10 @@
+var ObjectUtil = require('../../utils/ObjectUtil');
+
 /*
  * Example usage:
  *
  * var Component = require('../Component');
+ * var createElement = require('../../utils/ComponentUtil').createElement;
  * var ObjectUtil = require('./utils/ObjectUtil');
  *
  * module.exports = function MyComponent() {
@@ -28,92 +31,119 @@
  *       // Clean up component with element and props
  *     },
  *
- *     getView(props) {
- *       // Return string of component view
+ *     render(props) {
+ *       // Return element of component view
  *       return (
- *         '<div>' +
- *           'Example DIV' +
- *         '</div>'
+ *         createElement('div', null, [
+ *           createElement('Example content')
+ *         ])
  *       );
  *     }
  *   });
  * };
  */
 
+var attrNames = ['accept', 'accept-charset', 'accesskey', 'action', 'align', 'alt', 'async', 'autocomplete', 'autofocus', 'autoplay', 'bgcolor', 'border', 'buffered', 'challenge', 'charset', 'checked', 'cite', 'class', 'code', 'codebase', 'color', 'cols', 'colspan', 'content', 'contenteditable', 'contextmenu', 'controls', 'coords', 'crossorigin', 'data', 'datetime', 'default', 'defer', 'dir', 'dirname', 'disabled', 'download', 'draggable', 'dropzone', 'enctype', 'for', 'form', 'formaction', 'headers', 'height', 'hidden', 'high', 'href', 'hreflang', 'http-equiv', 'icon', 'id', 'integrity', 'ismap', 'itemprop', 'keytype', 'kind', 'label', 'lang', 'language', 'list', 'loop', 'low', 'manifest', 'max', 'maxlength', 'minlength', 'media', 'method', 'min', 'multiple', 'muted', 'name', 'novalidate', 'open', 'optimum', 'pattern', 'ping', 'placeholder', 'poster', 'preload', 'radiogroup', 'readonly', 'rel', 'required', 'reversed', 'rows', 'rowspan', 'sandbox', 'scope', 'scoped', 'seamless', 'selected', 'shape', 'size', 'sizes', 'slot', 'span', 'spellcheck', 'src', 'srcdoc', 'srclang', 'srcset', 'start', 'step', 'style', 'summary', 'tabindex', 'target', 'title', 'type', 'usemap', 'value', 'width', 'wrap'];
+
+function camelCaseToDash(str) {
+  return !str ? str : str.replace(/([A-Z])/g, function (g) {
+    return '-' + g[0].toLowerCase();
+  });
+}
+
 function Component() {
   // Private scope
   var element = null;
+  // var parentComponent = null;
+  var parentElement = null;
 
   return {
-    // Public API
-    /**
-     * Function to call when component should render into parent node
-     * Calls componentWillMount when node will be mounted
-     * Calls componentDidMount when node has mounted
-     * Calls componentWillUpdate when node will be updated
-     * Calls componentDidUpdate when node was updated
-     * @param {DOM Node} parentElement to render component within
-     * @param {Object} properties passed from render caller
-     */
-    render: function (parentElement, props) {
-      // Separate if-statement so Webpack knows to remove in production
-      if (process.env.NODE_ENV !== 'production') {
-        if (!parentElement) {
-          throw new Error('Parent of type: `' + typeof parentElement + '` is not valid. Please call `render` with a valid `HTMLElement`.');
-        }
+    forceUpdate: function () {
+      var props = this.props;
+      if (this.state == null) {
+        // Hard set this, so we don't call forceUpdate recursively
+        this.state = this.initialState();
       }
+
+      // Keep an updated copy of the parent
+      if (element && element.parentNode && element.parentNode !== parentElement) {
+        parentElement = element.parentNode;
+      }
+
+      var newElement = this.render(props);
+
+
+      var isMounting = element == null && newElement != null;
+      var isUnmounting = element != null && newElement == null;
 
       // Call will mount
-      if (element == null && typeof this.componentWillMount === 'function') {
+      if (isMounting && typeof this.componentWillMount === 'function') {
         this.componentWillMount(props);
       }
-
       // Call will update
-      if (element != null && typeof this.componentWillUpdate === 'function') {
+      if (!isMounting && typeof this.componentWillUpdate === 'function') {
         this.componentWillUpdate(element, props);
       }
-
-      // Create temporary node to set innerHTML in
-      var tempNode = global.document.createElement('div');
-      tempNode.innerHTML = this.getView(props);
-      // Get the first child of temporary node, i.e. our view and
-      // store our new instance, and this before we get the view
-      var newElement = tempNode.firstChild;
-
-      // Rendering into new parent, unmount this element, so we can create a new
-      if (element != null && parentElement !== element.parentNode) {
-        this.unmount(element, props);
-      }
-      // Make sure that element is actually a child node of parent
-      // before we attempt to replace
-      if (element != null && parentElement === element.parentNode) {
-        // Handle consecutive renders
-        /*
-         * Replace this line with:
-         * `dd.apply(element, dd.diff(element, element));`
-         * from https://github.com/fiduswriter/diffDOM to create a mini version
-         * of React
-         */
-        parentElement.replaceChild(newElement, element);
+      if (isUnmounting) {
+        this.unmount();
       }
 
-      if (element == null) {
-        // Handle first render
-        parentElement.appendChild(newElement);
+      // Set props given on element
+      if (newElement != null && typeof props === 'object' && props !== null) {
+        Object.keys(props).forEach(function (key) {
+          var value = props[key];
+          var attrName = camelCaseToDash(key);
+          if (typeof value !== undefined && (attrNames.includes(attrName) || attrName.startsWith('data-'))) {
+            newElement.setAttribute(attrName, value);
+          }
+        });
       }
-      // Store reference to element to be removed
+
+      if (newElement != null && typeof props.children === 'object' && props.children.length) {
+        props.children.forEach(function (child) {
+          if (child != null) {
+            newElement.appendChild(child);
+          }
+        });
+      }
+
       var oldElement = element;
       element = newElement;
 
+      if (parentElement != null && element != null && !parentElement.contains(element) && parentElement.contains(oldElement)) {
+        parentElement.replaceChild(element, oldElement);
+      } else if (parentElement != null && element != null && !parentElement.contains(element) && !parentElement.contains(oldElement)) {
+        parentElement.appendChild(element);
+      }
+
       // Call did mount
-      if (oldElement == null && typeof this.componentDidMount === 'function') {
+      if (isMounting && typeof this.componentDidMount === 'function') {
         this.componentDidMount(element, props);
       }
 
       // Call did update
-      if (oldElement != null && typeof this.componentDidUpdate === 'function') {
+      if (!isMounting && typeof this.componentDidUpdate === 'function') {
         this.componentDidUpdate(element, props);
       }
+    },
+
+    /**
+     * Attaches a component as child of an element
+     * @param  {HTMLElement} parentElement    element to mount component at
+     * @return {}
+     */
+    mount: function (_parentElement, props) {
+      if (_parentElement == null) {
+        return
+      }
+
+      if (element != null && element.parentNode !== _parentElement) {
+        this.unmount();
+      }
+
+      parentElement = _parentElement;
+      this.setProps(props);
+      this.forceUpdate();
     },
 
     /**
@@ -131,26 +161,47 @@ function Component() {
       }
 
       // Check if child still has a parent node before attempting to remove
-      if (element && element.parentNode) {
-        element.parentNode.removeChild(element);
+      if (parentElement != null && parentElement.contains(element)) {
+        parentElement.removeChild(element);
       }
 
       // Reset reference
       element = null;
+      parentElement = null;
     },
 
-    /**
-     * Produces view declaration in the form of a string
-     * @param  {Object} props properties passed to Component in `render`
-     * @return {String} view declaration to render in DOM
-     */
-    getView: function (props) {
-      // Separate if-statement so Webpack knows to remove in production
-      if (process.env.NODE_ENV !== 'production') {
-        throw new Error(typeof this + ' does not implement `getView`, but extends from Component. All objects that extends Component must implement `getView`');
+    initialState: function () {
+      return {};
+    },
+
+    getElement: function () {
+      return element;
+    },
+
+    setState: function (changes) {
+      var newState = ObjectUtil.assign({}, this.state, changes);
+      if (newState === this.state ) {
+        return;
       }
 
-      return '';
+      this.state = newState;
+      this.forceUpdate();
+    },
+
+    setProps: function (changes) {
+      var newProps = ObjectUtil.assign({}, this.props, changes);
+      if (newProps === this.props ) {
+        return;
+      }
+
+      this.props = newProps;
+    },
+
+    render: function () {
+      // Separate if-statement so Webpack knows to remove in production
+      if (process.env.NODE_ENV !== 'production') {
+        throw new Error('Component does not implement `render`, but extends from Component. All objects that extends Component must implement `render`');
+      }
     }
   };
 }

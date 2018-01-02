@@ -1,9 +1,11 @@
 var Component = require('../Component');
+var createElement = require('../../utils/ComponentUtil').createElement;
 var ObjectUtil = require('../../utils/ObjectUtil');
 
 function Thumbnail() {
   return ObjectUtil.assign(Object.create(new Component()), {
-    getView: function (props) {
+    name: 'thumbnail',
+    render: function (props) {
       var className = props.className;
       var index = props.index;
       var src = props.src;
@@ -17,25 +19,20 @@ function Thumbnail() {
         classes += ' ' + className;
       }
 
-      var dataIndex = '';
-      if (index != null) {
-        dataIndex = 'data-index="' + index + '" '
-      }
-
-      var titleElm = '';
+      var titleElm = null;
       if (title) {
-        titleElm = '<p class="title">' + title + '</p>';
+        titleElm = createElement('p', {class: 'title'}, [createElement(title)]);
       }
 
       return (
-        '<div class="' + classes + '"' + dataIndex + '>' +
-          '<div ' +
-            'class="fill-image" ' +
-            'data-src="' + src + '" ' +
-            'style="background-image: url(' + src + ')">' +
-          '</div>' +
-          titleElm +
-        '</div>'
+        createElement('div', {class: classes, dataIndex: index}, [
+          createElement('div', {
+            class: 'fill-image',
+            dataSrc: src,
+            style: 'background-image: url(' + src + ')'
+          }),
+          titleElm
+        ])
       );
     }
   });

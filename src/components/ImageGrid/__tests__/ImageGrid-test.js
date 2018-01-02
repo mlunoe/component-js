@@ -4,6 +4,7 @@ var expect = require('chai').expect;
 var sinon = require('sinon');
 var clock = sinon.useFakeTimers();
 
+var createElement = require('../../../utils/ComponentUtil').createElement;
 var EventTypes = require('../../../constants/EventTypes');
 var ImageGrid = require('../ImageGrid');
 var PhotoStore = require('../../../stores/PhotoStore');
@@ -44,7 +45,7 @@ describe('ImageGrid', function () {
       };
     };
 
-    imageGrid.render(div);
+    imageGrid.mount(div);
   });
 
   afterEach(function () {
@@ -75,7 +76,8 @@ describe('ImageGrid', function () {
       PhotoStore.getPhotos = function () {
         return [];
       };
-      imageGrid.render(div);
+      imageGrid.mount(div);
+      PhotoStore.emit(EventTypes.PHOTO_STORE_PHOTOS_CHANGE)
       var element = div.querySelector('.text-align-center.primary');
       expect(element.innerHTML).to.equal(
         'Sorry, no images was found from that search. ' +
@@ -92,11 +94,13 @@ describe('ImageGrid', function () {
       var firstGridItem = div.querySelector('.grid-item');
       firstGridItem.click();
       var imageViewer = div.querySelector('.image-viewer');
+      expect(imageViewer).to.not.equal(null);
       expect(imageViewer.tagName).to.equal('DIV');
 
       // Emit store event to fetch selected image
       PhotoStore.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, 'foo');
-      var selectedImage = imageViewer.querySelector('img');
+
+      var selectedImage = div.querySelector('img');
       expect(selectedImage.getAttribute('src')).to.equal('/foo-large');
     });
 
@@ -109,7 +113,8 @@ describe('ImageGrid', function () {
 
       // Emit store event to fetch selected image
       PhotoStore.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, 'foo');
-      var selectedImage = imageViewer.querySelector('img');
+
+      var selectedImage = div.querySelector('img');
       expect(selectedImage.getAttribute('src')).to.equal('/foo-large');
     });
 
