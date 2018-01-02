@@ -1,15 +1,15 @@
+var assign = require('../../utils/ObjectUtil').assign;
 var Component = require('../../components/Component');
 var createElement = require('../../utils/ComponentUtil').createElement;
 var EventTypes = require('../../constants/EventTypes');
 var ImageViewer = require('../../components/ImageViewer');
-var ObjectUtil = require('../../utils/ObjectUtil');
 var PhotoStore = require('../../stores/PhotoStore');
 var Thumbnail = require('../../components/Thumbnail');
 
 function ImageGrid() {
   var imageViewer = new ImageViewer();
 
-  var imageGrid = ObjectUtil.assign(Object.create(new Component()), {
+  var imageGrid = assign(Object.create(new Component()), {
     name: 'imageGrid',
     initialState: function () {
       return {
@@ -142,7 +142,7 @@ function ImageGrid() {
       }
 
       var tumbnails = photos.map(function (props, index) {
-        return createElement(new Thumbnail(), ObjectUtil.assign({}, props, {
+        return createElement(new Thumbnail(), assign({}, props, {
           className: 'grid-item',
           index: index
         }));

@@ -1,7 +1,7 @@
+var assign = require('../../utils/ObjectUtil').assign;
 var Component = require('../Component');
 var createElement = require('../../utils/ComponentUtil').createElement;
 var ImageGrid = require('../ImageGrid');
-var ObjectUtil = require('../../utils/ObjectUtil');
 var PhotoStore = require('../../stores/PhotoStore');
 var SearchBar = require('../SearchBar');
 
@@ -10,7 +10,7 @@ function App() {
   var searchBar = new SearchBar();
   var lastQuery = '';
 
-  return ObjectUtil.assign(Object.create(new Component()), {
+  return assign(Object.create(new Component()), {
     /* Lifecycle methods */
     componentDidMount: function () {
       // Fetch photos on intial render

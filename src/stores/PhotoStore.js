@@ -1,6 +1,6 @@
+var assign = require('../utils/ObjectUtil').assign;
 var EventEmitter = require('../events/EventEmitter');
 var EventTypes = require('../constants/EventTypes');
-var ObjectUtil = require('../utils/ObjectUtil');
 var RequestUtil = require('../utils/RequestUtil');
 
 function PhotoStore() {
@@ -21,7 +21,7 @@ function PhotoStore() {
   var images = [];
   var largeImages = {};
 
-  return ObjectUtil.assign(Object.create(new EventEmitter()), {
+  return assign(Object.create(new EventEmitter()), {
     fetchPhotos: function (queryString) {
       var query = '';
       if (queryString) {

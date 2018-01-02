@@ -1,12 +1,12 @@
+var assign = require('../../utils/ObjectUtil').assign;
 var Component = require('../../components/Component');
 var createElement = require('../../utils/ComponentUtil').createElement;
 var FunctionUtil = require('../../utils/FunctionUtil');
-var ObjectUtil = require('../../utils/ObjectUtil');
 
 function SearchBar() {
   var onChange;
 
-  return ObjectUtil.assign(Object.create(new Component()), {
+  return assign(Object.create(new Component()), {
     /* Lifecycle methods */
     componentDidMount: function () {
       this.componentDidUpdate.apply(this, arguments);

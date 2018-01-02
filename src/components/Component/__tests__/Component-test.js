@@ -6,7 +6,7 @@
 var expect = require('chai').expect;
 var sinon = require('sinon');
 
-var ObjectUtil = require('../../../utils/ObjectUtil');
+var assign = require('../../../utils/ObjectUtil').assign;
 var createElement = require('../../../utils/ComponentUtil').createElement;
 var Component = require('../Component');
 
@@ -15,7 +15,7 @@ describe('Component', function () {
   var component;
 
   beforeEach(function () {
-    component = ObjectUtil.assign(Object.create(new Component()), {
+    component = assign(Object.create(new Component()), {
       componentWillMount: sinon.spy(),
       componentDidMount: sinon.spy(),
       componentWillUpdate: sinon.spy(),
@@ -82,17 +82,17 @@ describe('Component', function () {
       // clean up div
       component.unmount();
       div = global.document.createElement('div');
-      var heading = ObjectUtil.assign(Object.create(new Component()), {
+      var heading = assign(Object.create(new Component()), {
         render: function () {
           return createElement('h1', {}, [createElement(this.props.title)]);
         }
       });
-      var subHeading = ObjectUtil.assign(Object.create(new Component()), {
+      var subHeading = assign(Object.create(new Component()), {
         render: function () {
           return createElement('p', {}, [createElement(this.props.content)]);
         }
       });
-      component = ObjectUtil.assign(Object.create(new Component()), {
+      component = assign(Object.create(new Component()), {
         render: function () {
           return createElement('div', { class: 'component' }, [
             createElement('div', null, [
@@ -120,7 +120,7 @@ describe('Component', function () {
 
     it('makes props available for componentWillMount', function () {
       // Needs new component to catch initial render
-      component = ObjectUtil.assign(Object.create(new Component()), {
+      component = assign(Object.create(new Component()), {
         componentWillMount: sinon.spy(),
         render: function () {
           return createElement('div', { class: 'component' }, [createElement('My Component')]);
@@ -151,7 +151,7 @@ describe('Component', function () {
 
     it('makes props available for componentDidMount', function () {
       // Needs new component to catch initial render
-      component = ObjectUtil.assign(Object.create(new Component()), {
+      component = assign(Object.create(new Component()), {
         componentDidMount: sinon.spy(),
         render: function () {
           return createElement('div', { class: 'component' }, [createElement('My Component')]);
@@ -195,7 +195,7 @@ describe('Component', function () {
 
     it('calls componentWillUnmount if component returns null', function () {
       var shouldReturnNull = false;
-      component = ObjectUtil.assign(Object.create(new Component()), {
+      component = assign(Object.create(new Component()), {
         componentWillUnmount: sinon.spy(),
         render: function () {
           if (shouldReturnNull) {

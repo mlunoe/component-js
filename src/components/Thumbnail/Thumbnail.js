@@ -1,9 +1,9 @@
+var assign = require('../../utils/ObjectUtil').assign;
 var Component = require('../Component');
 var createElement = require('../../utils/ComponentUtil').createElement;
-var ObjectUtil = require('../../utils/ObjectUtil');
 
 function Thumbnail() {
-  return ObjectUtil.assign(Object.create(new Component()), {
+  return assign(Object.create(new Component()), {
     name: 'thumbnail',
     render: function (props) {
       var className = props.className;
