@@ -14,7 +14,7 @@
   "scripts": {
     "start": "NODE_ENV=development webpack-dev-server --progress --colors",
     "deploy": "rm -rf dist && NODE_ENV=production webpack -p",
-    "test": "mocha src/**/__tests__/* src/**/__tests__/**/*"
+    "test": "eslint . && mocha src/**/__tests__/* src/**/__tests__/**/*"
   },
   "author": "https://github.com/mlunoe",
   "license": "ISC",
@@ -22,6 +22,9 @@
     "autoprefixer": "6.7.2",
     "chai": "3.5.0",
     "css-loader": "0.26.1",
+    "eslint": "4.14.0",
+    "eslint-config-airbnb-base": "12.1.0",
+    "eslint-plugin-import": "2.8.0",
     "file-loader": "0.10.0",
     "jsdom": "9.11.0",
     "mocha": "3.2.0",

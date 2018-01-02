@@ -1,12 +1,9 @@
 var Component = require('../Component');
 var createElement = require('../../utils/ComponentUtil').createElement;
-var EventTypes = require('../../constants/EventTypes');
-var FunctionUtil = require('../../utils/FunctionUtil');
 var ImageGrid = require('../ImageGrid');
 var ObjectUtil = require('../../utils/ObjectUtil');
 var PhotoStore = require('../../stores/PhotoStore');
 var SearchBar = require('../SearchBar');
-var Thumbnail = require('../Thumbnail');
 
 function App() {
   var imageGrid = new ImageGrid();
@@ -15,13 +12,13 @@ function App() {
 
   return ObjectUtil.assign(Object.create(new Component()), {
     /* Lifecycle methods */
-    componentDidMount: function (element, props) {
+    componentDidMount: function () {
       // Fetch photos on intial render
       PhotoStore.fetchPhotos(lastQuery);
     },
 
     render: function () {
-      return createElement('div', {class: 'app'}, [
+      return createElement('div', { class: 'app' }, [
         createElement(searchBar, {
           onChange: function () {
             // Don't re-fetch unless we have a new query

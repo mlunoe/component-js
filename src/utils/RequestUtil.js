@@ -13,7 +13,7 @@ var RequestUtil = {
     // Clean up after script
     script.onload = function () {
       global.document.body.removeChild(script);
-    }
+    };
 
     global[callbackName] = function (data) {
       onGoingRequests[callbackName]--;

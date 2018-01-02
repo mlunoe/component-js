@@ -11,7 +11,7 @@ function Image() {
         return null;
       }
 
-      return createElement('img', {src: src});
+      return createElement('img', { src: src });
     }
   });
 }

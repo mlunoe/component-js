@@ -11,10 +11,10 @@ function PhotoStore() {
   ];
   var restructureProperties = {
     media: function (media) {
-      return {prop: 'src', value: media.m};
+      return { prop: 'src', value: media.m };
     },
-    tags:  function (tags) {
-      return {prop: 'tags', value: tags.split(' ')};
+    tags: function (tags) {
+      return { prop: 'tags', value: tags.split(' ') };
     }
   };
 
@@ -33,6 +33,7 @@ function PhotoStore() {
         '&media=photos' +
         query;
       RequestUtil.jsonp(url, 'jsonFlickrFeed', function (photos) {
+        /* eslint-disable no-param-reassign */
         images = photos.items.map(function (photo) {
           // Reduce data to the format we want to store
           return Object.keys(photo).reduce(function (memo, prop) {
@@ -48,6 +49,7 @@ function PhotoStore() {
             return memo;
           }, {});
         });
+        /* eslint-enable no-param-reassign */
 
         // Emit change event
         this.emit(EventTypes.PHOTO_STORE_PHOTOS_CHANGE);
@@ -61,7 +63,7 @@ function PhotoStore() {
         return;
       }
 
-      var url =  baseUrl + '/rest/?method=flickr.photos.getSizes' +
+      var url = baseUrl + '/rest/?method=flickr.photos.getSizes' +
         '&api_key=1c00c6a8b785a5baf3fb98859ae3ed18' +
         '&photo_id=' + photoID +
         '&format=json';
@@ -80,7 +82,7 @@ function PhotoStore() {
           // First available size of eiter 'Original' or the last available size
           if (!largeImages[photoID] && (photo.label.indexOf('Original') > -1 ||
             (index + 1 === data.sizes.size.length))) {
-            largeImages[photoID] = {src: photo.source};
+            largeImages[photoID] = { src: photo.source };
           }
         });
 
@@ -95,6 +97,8 @@ function PhotoStore() {
         }
 
         this.emit(EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE, photoID);
+
+        return true;
       }.bind(this));
     },
 

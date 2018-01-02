@@ -1,4 +1,7 @@
-'use strict';
+/* global describe */
+/* global it */
+/* global beforeEach */
+/* global afterEach */
 
 var expect = require('chai').expect;
 var sinon = require('sinon');
@@ -19,7 +22,7 @@ describe('Component', function () {
       componentDidUpdate: sinon.spy(),
       componentWillUnmount: sinon.spy(),
       render: function () {
-        return createElement('div', {class: 'component'}, [createElement('My Component')]);
+        return createElement('div', { class: 'component' }, [createElement('My Component')]);
       }
     });
     div = global.document.createElement('div');
@@ -31,7 +34,6 @@ describe('Component', function () {
   });
 
   describe('#render()', function () {
-
     it('renders correctly', function () {
       expect(div.innerHTML).to.equal('<div class="component">My Component</div>');
     });
@@ -92,30 +94,26 @@ describe('Component', function () {
       });
       component = ObjectUtil.assign(Object.create(new Component()), {
         render: function () {
-          return createElement('div', {class: 'component'}, [
+          return createElement('div', { class: 'component' }, [
             createElement('div', null, [
-              createElement(heading, {title: 'My Component'}),
-              createElement(subHeading, {content: 'A long time ago, in a galaxy far, far away....'})
+              createElement(heading, { title: 'My Component' }),
+              createElement(subHeading, { content: 'A long time ago, in a galaxy far, far away....' })
             ])
           ]);
         }
       });
 
-      component.mount(div)
-      expect(div.innerHTML).to.equal(
-        '<div class="component">' +
+      component.mount(div);
+      expect(div.innerHTML).to.equal('<div class="component">' +
           '<div>' +
             '<h1 title="My Component">My Component</h1>' +
             '<p content="A long time ago, in a galaxy far, far away....">A long time ago, in a galaxy far, far away....</p>' +
           '</div>' +
-        '</div>'
-      );
+        '</div>');
     });
-
   });
 
   describe('life cycle methods', function () {
-
     it('calls componentWillMount if implemented', function () {
       expect(component.componentWillMount.calledOnce).to.equal(true);
     });
@@ -125,12 +123,12 @@ describe('Component', function () {
       component = ObjectUtil.assign(Object.create(new Component()), {
         componentWillMount: sinon.spy(),
         render: function () {
-          return createElement('div', {class: 'component'}, [createElement('My Component')]);
+          return createElement('div', { class: 'component' }, [createElement('My Component')]);
         }
       });
-      component.mount(div, {one: 'one', two: 'two', three: 'three'});
+      component.mount(div, { one: 'one', two: 'two', three: 'three' });
       var args = component.componentWillMount.args[0];
-      expect(args[0]).to.deep.equal({one: 'one', two: 'two', three: 'three'});
+      expect(args[0]).to.deep.equal({ one: 'one', two: 'two', three: 'three' });
     });
 
     it('calls componentWillUpdate if implemented', function () {
@@ -141,10 +139,10 @@ describe('Component', function () {
     it('makes props available for componentWillUpdate', function () {
       // Get element before second render
       var element = div.querySelector('.component');
-      component.mount(div, {one: 'one', two: 'two', three: 'three'});
-      var args = component.componentWillUpdate.args[0]
+      component.mount(div, { one: 'one', two: 'two', three: 'three' });
+      var args = component.componentWillUpdate.args[0];
       expect(args[0].innerHTML).to.deep.equal(element.innerHTML);
-      expect(args[1]).to.deep.equal({one: 'one', two: 'two', three: 'three'});
+      expect(args[1]).to.deep.equal({ one: 'one', two: 'two', three: 'three' });
     });
 
     it('calls componentDidMount if implemented', function () {
@@ -156,14 +154,14 @@ describe('Component', function () {
       component = ObjectUtil.assign(Object.create(new Component()), {
         componentDidMount: sinon.spy(),
         render: function () {
-          return createElement('div', {class: 'component'}, [createElement('My Component')]);
+          return createElement('div', { class: 'component' }, [createElement('My Component')]);
         }
       });
-      component.mount(div, {one: 'one', two: 'two', three: 'three'});
+      component.mount(div, { one: 'one', two: 'two', three: 'three' });
       var element = div.querySelector('.component');
-      var args = component.componentDidMount.args[0]
+      var args = component.componentDidMount.args[0];
       expect(args[0].innerHTML).to.deep.equal(element.innerHTML);
-      expect(args[1]).to.deep.equal({one: 'one', two: 'two', three: 'three'});
+      expect(args[1]).to.deep.equal({ one: 'one', two: 'two', three: 'three' });
     });
 
     it('calls componentDidUpdate if implemented', function () {
@@ -172,11 +170,11 @@ describe('Component', function () {
     });
 
     it('makes props available for componentDidUpdate', function () {
-      component.mount(div, {one: 'one', two: 'two', three: 'three'});
+      component.mount(div, { one: 'one', two: 'two', three: 'three' });
       var element = div.querySelector('.component');
-      var args = component.componentDidUpdate.args[0]
+      var args = component.componentDidUpdate.args[0];
       expect(args[0].innerHTML).to.deep.equal(element.innerHTML);
-      expect(args[1]).to.deep.equal({one: 'one', two: 'two', three: 'three'});
+      expect(args[1]).to.deep.equal({ one: 'one', two: 'two', three: 'three' });
     });
 
     it('removes child correctly', function () {
@@ -191,7 +189,7 @@ describe('Component', function () {
     });
 
     it('calls componentWillUnmount when mounted into new parent', function () {
-      component.mount(document.createElement('div'));
+      component.mount(global.document.createElement('div'));
       expect(component.componentWillUnmount.calledOnce).to.equal(true);
     });
 
@@ -202,9 +200,8 @@ describe('Component', function () {
         render: function () {
           if (shouldReturnNull) {
             return null;
-          } else {
-            return createElement('div');
           }
+          return createElement('div');
         }
       });
       component.mount(div);
@@ -219,7 +216,5 @@ describe('Component', function () {
       component.unmount();
       expect(component.componentWillUnmount.calledOnce).to.equal(true);
     });
-
   });
-
 });

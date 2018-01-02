@@ -8,7 +8,7 @@ var PhotoStore = require('../../stores/PhotoStore');
 
 var getPhotoID = function (link) {
   var segments = link.split('/');
-  var id = segments.pop()
+  var id = segments.pop();
   while (!id && segments.length) {
     id = segments.pop();
   }
@@ -30,13 +30,13 @@ function ImageViewer() {
       var close = event.target.getAttribute('data-close');
 
       // Handle change image left
-      if (typeof props.onLeftClick === 'function' && direction === 'left' ||
+      if ((typeof props.onLeftClick === 'function' && direction === 'left') ||
         keyCode === keyCodes.leftArrow) {
         props.onLeftClick(event);
       }
 
       // Handle change image right
-      if (typeof props.onRightClick === 'function' && direction === 'right' ||
+      if ((typeof props.onRightClick === 'function' && direction === 'right') ||
         keyCode === keyCodes.rightArrow) {
         props.onRightClick(event);
       }
@@ -45,7 +45,7 @@ function ImageViewer() {
         direction === 'right' || keyCode === keyCodes.rightArrow) {
         // Hide error message and display image and show loader
         photoID = null;
-        imageViewer.setState({errorMessage: null, photo: null})
+        imageViewer.setState({ errorMessage: null, photo: null });
       }
 
       // Handle close viewer
@@ -56,7 +56,7 @@ function ImageViewer() {
         }
         // Remove class to animate. Call close when animation is done
         if (element) {
-          element.classList.remove('show')
+          element.classList.remove('show');
         }
 
         setTimeout(function () {
@@ -80,11 +80,11 @@ function ImageViewer() {
         return;
       }
 
-      imageViewer.setState({errorMessage: message || 'Image request error'});
+      imageViewer.setState({ errorMessage: message || 'Image request error' });
     },
 
     /* Lifecycle methods */
-    componentDidMount: function (element, props) {
+    componentDidMount: function () {
       // Set global listeners
       global.addEventListener('keydown', this.handleImageEvent, false);
       PhotoStore.addListener(
@@ -98,7 +98,7 @@ function ImageViewer() {
       this.componentDidUpdate.apply(this, arguments);
     },
 
-    componentWillUpdate: function (element, props) {
+    componentWillUpdate: function (element) {
       // Clean up element listeners
       if (element) {
         element.removeEventListener('click', this.handleImageEvent, false);
@@ -183,7 +183,7 @@ function ImageViewer() {
 
       var errorMessageComp = null;
       if (typeof errorMessage === 'string') {
-        errorMessageComp = createElement('p', {class: 'error-message primary'}, [
+        errorMessageComp = createElement('p', { class: 'error-message primary' }, [
           createElement(errorMessage)
         ]);
       }
@@ -196,17 +196,17 @@ function ImageViewer() {
       var title = null;
       if (child.title) {
         title = (
-          createElement('p', {class: 'title text-white text-align-center'}, [
+          createElement('p', { class: 'title text-white text-align-center' }, [
             createElement(child.title)
           ])
         );
       }
 
       return (
-        createElement('div', {class: imageViewerBackdropClasses, dataClose: dataClose}, [
-          createElement('div', {class: 'image-viewer'}, [
-            createElement('span', {dataClose: 'true', class: 'close-button'}),
-            createElement('div', {class: loaderWrapperClasses}, [
+        createElement('div', { class: imageViewerBackdropClasses, dataClose: dataClose }, [
+          createElement('div', { class: 'image-viewer' }, [
+            createElement('span', { dataClose: 'true', class: 'close-button' }),
+            createElement('div', { class: loaderWrapperClasses }, [
               createElement('div'),
               createElement('div'),
               createElement('div')
@@ -214,9 +214,9 @@ function ImageViewer() {
             errorMessageComp,
             displayImage,
             title,
-            createElement('div', {class: 'arrow-container'}, [
-              createElement('span', {class: 'arrow left', dataDirection: 'left'}),
-              createElement('span', {class: 'arrow right', dataDirection: 'right'})
+            createElement('div', { class: 'arrow-container' }, [
+              createElement('span', { class: 'arrow left', dataDirection: 'left' }),
+              createElement('span', { class: 'arrow right', dataDirection: 'right' })
             ])
           ])
         ])

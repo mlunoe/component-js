@@ -21,11 +21,11 @@ function Thumbnail() {
 
       var titleElm = null;
       if (title) {
-        titleElm = createElement('p', {class: 'title'}, [createElement(title)]);
+        titleElm = createElement('p', { class: 'title' }, [createElement(title)]);
       }
 
       return (
-        createElement('div', {class: classes, dataIndex: index}, [
+        createElement('div', { class: classes, dataIndex: index }, [
           createElement('div', {
             class: 'fill-image',
             dataSrc: src,
