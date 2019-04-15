@@ -30,19 +30,19 @@ function ImageViewer() {
       var close = event.target.getAttribute('data-close');
 
       // Handle change image left
-      if ((typeof props.onLeftClick === 'function' && direction === 'left') ||
-        keyCode === keyCodes.leftArrow) {
+      if ((typeof props.onLeftClick === 'function' && direction === 'left')
+        || keyCode === keyCodes.leftArrow) {
         props.onLeftClick(event);
       }
 
       // Handle change image right
-      if ((typeof props.onRightClick === 'function' && direction === 'right') ||
-        keyCode === keyCodes.rightArrow) {
+      if ((typeof props.onRightClick === 'function' && direction === 'right')
+        || keyCode === keyCodes.rightArrow) {
         props.onRightClick(event);
       }
 
-      if (direction === 'left' || keyCode === keyCodes.leftArrow ||
-        direction === 'right' || keyCode === keyCodes.rightArrow) {
+      if (direction === 'left' || keyCode === keyCodes.leftArrow
+        || direction === 'right' || keyCode === keyCodes.rightArrow) {
         // Hide error message and display image and show loader
         photoID = null;
         imageViewer.setState({ errorMessage: null, photo: null });
@@ -86,7 +86,7 @@ function ImageViewer() {
     /* Lifecycle methods */
     componentDidMount: function () {
       // Set global listeners
-      global.addEventListener('keydown', this.handleImageEvent, false);
+      global.document.addEventListener('keydown', this.handleImageEvent, false);
       PhotoStore.addListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
         this.handleUpdatePhotoID
@@ -134,7 +134,7 @@ function ImageViewer() {
 
     componentWillUnmount: function (element) {
       // Clean up global listeners
-      global.removeEventListener('keydown', this.handleImageEvent, false);
+      global.document.removeEventListener('keydown', this.handleImageEvent, false);
       // Clean up element listeners
       if (element) {
         element.removeEventListener('click', this.handleImageEvent, false);

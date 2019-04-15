@@ -1,8 +1,8 @@
 /* global describe */
 /* global it */
 
-var assign = require('../ObjectUtil').assign;
 var expect = require('chai').expect;
+var assign = require('../ObjectUtil').assign;
 
 describe('ObjectUtil', function () {
   describe('#assign()', function () {

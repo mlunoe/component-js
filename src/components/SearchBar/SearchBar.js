@@ -34,9 +34,9 @@ function SearchBar() {
     /* View functions */
     render: function (props) {
       if (typeof props.onChange !== 'function') {
-        throw new Error('SearchBar needs onChange as a function. Type "' +
-          typeof props.onChange +
-          '" was given.');
+        throw new Error('SearchBar needs onChange as a function. Type "'
+          + typeof props.onChange
+          + '" was given.');
       }
 
       return (
