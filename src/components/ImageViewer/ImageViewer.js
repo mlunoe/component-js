@@ -86,7 +86,7 @@ function ImageViewer() {
     /* Lifecycle methods */
     componentDidMount: function () {
       // Set global listeners
-      global.addEventListener('keydown', this.handleImageEvent, false);
+      global.document.addEventListener('keydown', this.handleImageEvent, false);
       PhotoStore.addListener(
         EventTypes.PHOTO_STORE_SINGLE_PHOTO_CHANGE,
         this.handleUpdatePhotoID
@@ -134,7 +134,7 @@ function ImageViewer() {
 
     componentWillUnmount: function (element) {
       // Clean up global listeners
-      global.removeEventListener('keydown', this.handleImageEvent, false);
+      global.document.removeEventListener('keydown', this.handleImageEvent, false);
       // Clean up element listeners
       if (element) {
         element.removeEventListener('click', this.handleImageEvent, false);
