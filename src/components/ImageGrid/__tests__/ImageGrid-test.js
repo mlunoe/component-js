@@ -3,11 +3,11 @@
 /* global beforeEach */
 /* global afterEach */
 
-var EventTypes = require('../../../constants/EventTypes');
 var expect = require('chai').expect;
-var ImageGrid = require('../ImageGrid');
-var PhotoStore = require('../../../stores/PhotoStore');
 var sinon = require('sinon');
+var EventTypes = require('../../../constants/EventTypes');
+var PhotoStore = require('../../../stores/PhotoStore');
+var ImageGrid = require('../ImageGrid');
 
 var clock = sinon.useFakeTimers();
 
@@ -80,8 +80,8 @@ describe('ImageGrid', function () {
       imageGrid.mount(div);
       PhotoStore.emit(EventTypes.PHOTO_STORE_PHOTOS_CHANGE);
       var element = div.querySelector('.text-align-center.primary');
-      expect(element.innerHTML).to.equal('Sorry, no images was found from that search. ' +
-        'Please try another search.');
+      expect(element.innerHTML).to.equal('Sorry, no images was found from that search. '
+        + 'Please try another search.');
     });
   });
 

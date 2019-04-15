@@ -104,12 +104,12 @@ describe('Component', function () {
       });
 
       component.mount(div);
-      expect(div.innerHTML).to.equal('<div class="component">' +
-          '<div>' +
-            '<h1 title="My Component">My Component</h1>' +
-            '<p content="A long time ago, in a galaxy far, far away....">A long time ago, in a galaxy far, far away....</p>' +
-          '</div>' +
-        '</div>');
+      expect(div.innerHTML).to.equal('<div class="component">'
+          + '<div>'
+            + '<h1 title="My Component">My Component</h1>'
+            + '<p content="A long time ago, in a galaxy far, far away....">A long time ago, in a galaxy far, far away....</p>'
+          + '</div>'
+        + '</div>');
     });
   });
 

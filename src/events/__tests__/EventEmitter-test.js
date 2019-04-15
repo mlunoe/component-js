@@ -2,9 +2,9 @@
 /* global it */
 /* global beforeEach */
 
-var EventEmitter = require('../EventEmitter');
 var expect = require('chai').expect;
 var sinon = require('sinon');
+var EventEmitter = require('../EventEmitter');
 
 describe('EventEmitter', function () {
   var spy;

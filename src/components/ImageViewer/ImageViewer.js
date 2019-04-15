@@ -30,19 +30,19 @@ function ImageViewer() {
       var close = event.target.getAttribute('data-close');
 
       // Handle change image left
-      if ((typeof props.onLeftClick === 'function' && direction === 'left') ||
-        keyCode === keyCodes.leftArrow) {
+      if ((typeof props.onLeftClick === 'function' && direction === 'left')
+        || keyCode === keyCodes.leftArrow) {
         props.onLeftClick(event);
       }
 
       // Handle change image right
-      if ((typeof props.onRightClick === 'function' && direction === 'right') ||
-        keyCode === keyCodes.rightArrow) {
+      if ((typeof props.onRightClick === 'function' && direction === 'right')
+        || keyCode === keyCodes.rightArrow) {
         props.onRightClick(event);
       }
 
-      if (direction === 'left' || keyCode === keyCodes.leftArrow ||
-        direction === 'right' || keyCode === keyCodes.rightArrow) {
+      if (direction === 'left' || keyCode === keyCodes.leftArrow
+        || direction === 'right' || keyCode === keyCodes.rightArrow) {
         // Hide error message and display image and show loader
         photoID = null;
         imageViewer.setState({ errorMessage: null, photo: null });

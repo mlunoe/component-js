@@ -27,11 +27,11 @@ function PhotoStore() {
       if (queryString) {
         query = '&tags=' + queryString;
       }
-      var url = baseUrl + '/feeds/photos_public.gne?' +
-        'format=json' +
-        '&safe_search=1' + // turn on safe search
-        '&media=photos' +
-        query;
+      var url = baseUrl + '/feeds/photos_public.gne?'
+        + 'format=json'
+        + '&safe_search=1' // turn on safe search
+        + '&media=photos'
+        + query;
       RequestUtil.jsonp(url, 'jsonFlickrFeed', function (photos) {
         /* eslint-disable no-param-reassign */
         images = photos.items.map(function (photo) {
@@ -63,10 +63,10 @@ function PhotoStore() {
         return;
       }
 
-      var url = baseUrl + '/rest/?method=flickr.photos.getSizes' +
-        '&api_key=1c00c6a8b785a5baf3fb98859ae3ed18' +
-        '&photo_id=' + photoID +
-        '&format=json';
+      var url = baseUrl + '/rest/?method=flickr.photos.getSizes'
+        + '&api_key=1c00c6a8b785a5baf3fb98859ae3ed18'
+        + '&photo_id=' + photoID
+        + '&format=json';
       RequestUtil.jsonp(url, 'jsonFlickrApi' + Date.now(), function (data) {
         if (data.stat !== 'ok') {
           this.emit(
@@ -80,8 +80,8 @@ function PhotoStore() {
 
         data.sizes.size.forEach(function (photo, index) {
           // First available size of eiter 'Original' or the last available size
-          if (!largeImages[photoID] && (photo.label.indexOf('Original') > -1 ||
-            (index + 1 === data.sizes.size.length))) {
+          if (!largeImages[photoID] && (photo.label.indexOf('Original') > -1
+            || (index + 1 === data.sizes.size.length))) {
             largeImages[photoID] = { src: photo.source };
           }
         });
