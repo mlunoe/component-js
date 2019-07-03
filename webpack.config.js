@@ -1,5 +1,6 @@
 var autoprefixer = require('autoprefixer');
 var path = require('path');
+var { CleanWebpackPlugin } = require('clean-webpack-plugin');
 var webpack = require('webpack');
 
 /**
@@ -54,6 +55,7 @@ if (process.env.NODE_ENV === 'development') {
  */
 if (process.env.NODE_ENV === 'production') {
   // Production specific configuration, that are not overridden by development
+  plugins.push(new CleanWebpackPlugin());
 }
 
 module.exports = {
@@ -97,13 +99,15 @@ module.exports = {
       // File HTML loader
       {
         test: /\.html$/,
-        use: [{
-          loader: 'file-loader',
-          options: {
-            // Keep original name, don't obscure
-            name: '[name].[ext]'
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              // Keep original name, don't obscure
+              name: '[name].[ext]'
+            }
           }
-        }],
+        ],
         exclude: /node_modules/
       }
     ]
